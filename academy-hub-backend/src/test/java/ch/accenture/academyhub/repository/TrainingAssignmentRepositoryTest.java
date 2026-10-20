@@ -1,0 +1,75 @@
+package ch.accenture.academyhub.repository;
+
+import ch.accenture.academyhub.entity.Role;
+import ch.accenture.academyhub.entity.Training;
+import ch.accenture.academyhub.entity.TrainingAssignment;
+import ch.accenture.academyhub.entity.User;
+import jakarta.persistence.EntityManager;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@SpringBootTest
+@Transactional
+class TrainingAssignmentRepositoryTest {
+
+    @Autowired
+    private TrainingAssignmentRepository assignmentRepository;
+
+    @Autowired
+    private EntityManager entityManager;
+
+    @Test
+    void returnsOnlyRequestedLearnersAssignmentsSortedByTrainingName() {
+        User learnerA = new User("Repository Test A", Role.LEARNER);
+        User learnerB = new User("Repository Test B", Role.LEARNER);
+        entityManager.persist(learnerA);
+        entityManager.persist(learnerB);
+
+        Training java = new Training("Java Fundamentals", learnerA);
+        Training angular = new Training("Angular Fundamentals", learnerA);
+        Training other = new Training("Other Learner Training", learnerB);
+        entityManager.persist(java);
+        entityManager.persist(angular);
+        entityManager.persist(other);
+
+        entityManager.persist(new TrainingAssignment(java, learnerA));
+        entityManager.persist(new TrainingAssignment(angular, learnerA));
+        entityManager.persist(new TrainingAssignment(other, learnerB));
+
+        entityManager.flush();
+        entityManager.clear();
+
+        List<TrainingAssignment> result = assignmentRepository
+                .findAllWithTrainingByLearnerId(learnerA.getId());
+
+        assertEquals(
+                List.of("Angular Fundamentals", "Java Fundamentals"),
+                result.stream()
+                        .map(assignment -> assignment.getTraining().getName())
+                        .toList()
+        );
+
+        assertTrue(result.stream().allMatch(assignment ->
+                assignment.getLearner().getId().equals(learnerA.getId())
+        ));
+    }
+
+    @Test
+    void returnsEmptyListForLearnerWithoutAssignments() {
+        User learner = new User("Repository Test Empty", Role.LEARNER);
+        entityManager.persist(learner);
+        entityManager.flush();
+        entityManager.clear();
+
+        List<TrainingAssignment> result = assignmentRepository
+                .findAllWithTrainingByLearnerId(learner.getId());
+
+        assertTrue(result.isEmpty());
+    }
+}
