@@ -20,4 +20,6 @@ public interface TrainingAssignmentRepository
     List<TrainingAssignment> findAllWithTrainingByLearnerId(
             @Param("learnerId") Long learnerId
     );
+
+    List<TrainingAssignment> findAllByTrainingId(Long trainingId);
 }

@@ -36,5 +36,7 @@ public class Training {
         return createdBy;
     }
 
-
+    public void rename(String name) {
+        this.name = name;
+    }
 }
