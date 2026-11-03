@@ -53,6 +53,12 @@ class TrainingControllerTest {
     }
 
     @Test
+    void learnerCanCompleteTrainingUsingAuthenticatedIdentity() {
+        controller.completeTraining(learner(), 2L);
+        verify(trainingService).completeTraining(4L, 2L);
+    }
+
+    @Test
     void adminCanRetrieveTrainingForSelectedLearner() {
         when(trainingService.getTrainingsForLearner(4L)).thenReturn(List.of());
 
