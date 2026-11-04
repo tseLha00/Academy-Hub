@@ -7,6 +7,7 @@ public record TrainingResponse(
         Long trainingId,
         String name,
         boolean completed,
-        Instant completedAt
+        Instant completedAt,
+        int progressPercentage
 ) {
 }

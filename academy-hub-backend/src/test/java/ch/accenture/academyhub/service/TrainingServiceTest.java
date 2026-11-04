@@ -55,6 +55,49 @@ class TrainingServiceTest {
     }
 
     @Test
+    void updatesProgressForAssignedLearner() {
+        TrainingAssignment assignment = mock(TrainingAssignment.class);
+        when(assignmentRepository.findByTrainingIdAndLearnerId(2L, 4L))
+                .thenReturn(Optional.of(assignment));
+
+        trainingService.updateTrainingProgress(4L, 2L, 65);
+
+        verify(assignment).updateProgressPercentage(65);
+        verify(assignmentRepository).save(assignment);
+    }
+
+    @Test
+    void doesNotUpdateProgressWhenTrainingIsNotAssignedToLearner() {
+        when(assignmentRepository.findByTrainingIdAndLearnerId(2L, 4L))
+                .thenReturn(Optional.empty());
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> trainingService.updateTrainingProgress(4L, 2L, 65)
+        );
+
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        verify(assignmentRepository, never()).save(any());
+    }
+
+    @Test
+    void rejectsReducingProgressAfterCompletion() {
+        TrainingAssignment assignment = mock(TrainingAssignment.class);
+        when(assignmentRepository.findByTrainingIdAndLearnerId(2L, 4L))
+                .thenReturn(Optional.of(assignment));
+        doThrow(new IllegalStateException("Completed training progress cannot be reduced"))
+                .when(assignment).updateProgressPercentage(65);
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> trainingService.updateTrainingProgress(4L, 2L, 65)
+        );
+
+        assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
+        verify(assignmentRepository, never()).save(any());
+    }
+
+    @Test
     void returnsEmptyListWhenLearnerHasNoAssignments() {
         when(assignmentRepository.findAllWithTrainingByLearnerId(4L))
                 .thenReturn(List.of());
@@ -78,6 +121,7 @@ class TrainingServiceTest {
         when(assignment.getTraining()).thenReturn(training);
         when(assignment.isCompleted()).thenReturn(false);
         when(assignment.getCompletedAt()).thenReturn(null);
+        when(assignment.getProgressPercentage()).thenReturn(0);
 
         when(assignmentRepository.findAllWithTrainingByLearnerId(4L))
                 .thenReturn(List.of(assignment));
@@ -91,7 +135,8 @@ class TrainingServiceTest {
                         2L,
                         "Java Fundamentals",
                         false,
-                        null
+                        null,
+                        0
                 )),
                 result
         );
@@ -111,6 +156,7 @@ class TrainingServiceTest {
         when(assignment.getTraining()).thenReturn(training);
         when(assignment.isCompleted()).thenReturn(true);
         when(assignment.getCompletedAt()).thenReturn(completedAt);
+        when(assignment.getProgressPercentage()).thenReturn(100);
 
         when(assignmentRepository.findAllWithTrainingByLearnerId(4L))
                 .thenReturn(List.of(assignment));
@@ -124,7 +170,8 @@ class TrainingServiceTest {
                         2L,
                         "Java Fundamentals",
                         true,
-                        completedAt
+                        completedAt,
+                        100
                 )),
                 result
         );

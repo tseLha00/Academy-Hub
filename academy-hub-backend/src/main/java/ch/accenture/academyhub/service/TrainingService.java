@@ -34,6 +34,24 @@ public class TrainingService {
         assignmentRepository.save(assignment);
     }
 
+    /** Updates progress only for the authenticated learner's own assignment. */
+    @Transactional
+    public void updateTrainingProgress(Long learnerId, Long trainingId, int progressPercentage) {
+        var assignment = assignmentRepository
+                .findByTrainingIdAndLearnerId(trainingId, learnerId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Training assignment not found"
+                ));
+
+        try {
+            assignment.updateProgressPercentage(progressPercentage);
+        } catch (IllegalStateException exception) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, exception.getMessage());
+        }
+        assignmentRepository.save(assignment);
+    }
+
     @Transactional(readOnly = true)
     public List<TrainingResponse> getTrainingsForLearner(Long learnerId) {
         return assignmentRepository
@@ -44,7 +62,8 @@ public class TrainingService {
                         assignment.getTraining().getId(),
                         assignment.getTraining().getName(),
                         assignment.isCompleted(),
-                        assignment.getCompletedAt()
+                        assignment.getCompletedAt(),
+                        assignment.getProgressPercentage()
                 ))
                 .toList();
     }
