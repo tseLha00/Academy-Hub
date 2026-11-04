@@ -13,20 +13,23 @@ public final class AcademyUserPrincipal implements UserDetails {
     private final Long id;
     private final String username;
     private final String passwordHash;
-    private final String displayName;
+    private final String firstName;
+    private final String lastName;
     private final Role role;
 
     public AcademyUserPrincipal(
             Long id,
             String username,
             String passwordHash,
-            String displayName,
+            String firstName,
+            String lastName,
             Role role
     ) {
         this.id = id;
         this.username = username;
         this.passwordHash = passwordHash;
-        this.displayName = displayName;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.role = role;
     }
 
@@ -34,8 +37,16 @@ public final class AcademyUserPrincipal implements UserDetails {
         return id;
     }
 
-    public String getDisplayName() {
-        return displayName;
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getFullName() {
+        return firstName + " " + lastName;
     }
 
     public Role getRole() {

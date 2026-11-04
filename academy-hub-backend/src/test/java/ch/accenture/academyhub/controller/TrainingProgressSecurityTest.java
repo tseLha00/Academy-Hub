@@ -35,7 +35,7 @@ class TrainingProgressSecurityTest {
     @Test
     void learnerCanUpdateTrainingProgress() throws Exception {
         AcademyUserPrincipal learner = new AcademyUserPrincipal(
-                4L, "learner", "hash", "Test Learner", Role.LEARNER
+                4L, "learner", "hash", "Test", "Learner", Role.LEARNER
         );
 
         var authentication = new UsernamePasswordAuthenticationToken(
@@ -55,7 +55,7 @@ class TrainingProgressSecurityTest {
     @Test
     void adminCannotUpdateTrainingProgress() throws Exception {
         AcademyUserPrincipal admin = new AcademyUserPrincipal(
-                6L, "admin", "hash", "Test Admin", Role.ADMIN
+                6L, "admin", "hash", "Test", "Admin", Role.ADMIN
         );
 
         var authentication = new UsernamePasswordAuthenticationToken(
