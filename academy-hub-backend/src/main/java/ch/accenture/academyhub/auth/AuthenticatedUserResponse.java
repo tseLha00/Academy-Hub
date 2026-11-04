@@ -5,7 +5,9 @@ import ch.accenture.academyhub.entity.Role;
 public record AuthenticatedUserResponse(
         Long id,
         String username,
-        String displayName,
+        String firstName,
+        String lastName,
+        String fullName,
         Role role
 ) {
 }

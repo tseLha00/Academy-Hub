@@ -634,7 +634,12 @@ class TrainingManagementServiceTest {
     }
 
     private User persistUser(String name, Role role) {
-        User user = new User(name, role);
+        String[] nameParts = name.strip().split("\\s+", 2);
+
+        String firstName = nameParts[0];
+        String lastName = nameParts.length > 1 ? nameParts[1] : "User";
+
+        User user = new User(firstName, lastName, role);
         entityManager.persist(user);
         return user;
     }
