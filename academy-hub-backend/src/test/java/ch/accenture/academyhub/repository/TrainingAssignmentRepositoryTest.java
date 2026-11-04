@@ -97,11 +97,77 @@ class TrainingAssignmentRepositoryTest {
                 .orElseThrow();
         assertTrue(reloaded.isCompleted());
         assertNotNull(reloaded.getCompletedAt());
+        assertEquals(100, reloaded.getProgressPercentage());
 
         TrainingAssignment otherLearnerAssignment = assignmentRepository
                 .findByTrainingIdAndLearnerId(training.getId(), learnerB.getId())
                 .orElseThrow();
         assertFalse(otherLearnerAssignment.isCompleted());
+        assertEquals(0, otherLearnerAssignment.getProgressPercentage());
+    }
+
+    @Test
+    void persistsPartialProgressForLearnerAssignment() {
+        User learner = new User("Progress Test Learner", Role.LEARNER);
+        entityManager.persist(learner);
+        Training training = new Training("Progress Test Training", learner);
+        entityManager.persist(training);
+        TrainingAssignment assignment = new TrainingAssignment(training, learner);
+        entityManager.persist(assignment);
+
+        assignment.updateProgressPercentage(45);
+        entityManager.flush();
+        entityManager.clear();
+
+        TrainingAssignment reloaded = assignmentRepository
+                .findByTrainingIdAndLearnerId(training.getId(), learner.getId())
+                .orElseThrow();
+        assertEquals(45, reloaded.getProgressPercentage());
+        assertFalse(reloaded.isCompleted());
+        assertNull(reloaded.getCompletedAt());
+    }
+
+    @Test
+    void rejectsProgressOutsideZeroToOneHundred() {
+        User learner = new User("Invalid Progress Learner", Role.LEARNER);
+        entityManager.persist(learner);
+        Training training = new Training("Invalid Progress Training", learner);
+        entityManager.persist(training);
+        TrainingAssignment assignment = new TrainingAssignment(training, learner);
+        assertThrows(IllegalArgumentException.class,
+                () -> assignment.updateProgressPercentage(101));
+        assertThrows(IllegalArgumentException.class,
+                () -> assignment.updateProgressPercentage(-1));
+    }
+
+    @Test
+    void settingProgressToOneHundredMarksAssignmentCompleted() {
+        User learner = new User("Complete Progress Learner", Role.LEARNER);
+        entityManager.persist(learner);
+        Training training = new Training("Complete Progress Training", learner);
+        entityManager.persist(training);
+        TrainingAssignment assignment = new TrainingAssignment(training, learner);
+
+        assignment.updateProgressPercentage(100);
+
+        assertEquals(100, assignment.getProgressPercentage());
+        assertTrue(assignment.isCompleted());
+        assertNotNull(assignment.getCompletedAt());
+    }
+
+    @Test
+    void completedAssignmentCannotBeMovedBackwards() {
+        User learner = new User("Backward Progress Learner", Role.LEARNER);
+        entityManager.persist(learner);
+        Training training = new Training("Backward Progress Training", learner);
+        entityManager.persist(training);
+        TrainingAssignment assignment = new TrainingAssignment(training, learner);
+        assignment.markCompleted();
+
+        assertThrows(IllegalStateException.class,
+                () -> assignment.updateProgressPercentage(80));
+        assertEquals(100, assignment.getProgressPercentage());
+        assertTrue(assignment.isCompleted());
     }
 
     @Test
