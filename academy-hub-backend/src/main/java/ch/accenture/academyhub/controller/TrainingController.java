@@ -41,6 +41,17 @@ public class TrainingController {
         return trainingService.getTrainingsForLearner(principal.getId());
     }
 
+    /** A learner can complete only a training assigned to their own account. */
+    @PostMapping("/trainings/{trainingId}/complete")
+    @PreAuthorize("hasRole('LEARNER')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void completeTraining(
+            @AuthenticationPrincipal AcademyUserPrincipal principal,
+            @PathVariable Long trainingId
+    ) {
+        trainingService.completeTraining(principal.getId(), trainingId);
+    }
+
     /** Admin-only learner lookup, used by administrative workflows. */
     @GetMapping("/admin/learners/{learnerId}/trainings")
     @PreAuthorize("hasRole('ADMIN')")

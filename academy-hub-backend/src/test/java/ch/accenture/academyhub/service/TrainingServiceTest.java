@@ -5,6 +5,8 @@ import ch.accenture.academyhub.entity.Training;
 import ch.accenture.academyhub.entity.TrainingAssignment;
 import ch.accenture.academyhub.repository.TrainingAssignmentRepository;
 import org.junit.jupiter.api.Test;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -12,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -24,6 +27,32 @@ class TrainingServiceTest {
 
     @InjectMocks
     private TrainingService trainingService;
+
+    @Test
+    void completesTrainingAssignedToLearner() {
+        TrainingAssignment assignment = mock(TrainingAssignment.class);
+        when(assignmentRepository.findByTrainingIdAndLearnerId(2L, 4L))
+                .thenReturn(Optional.of(assignment));
+
+        trainingService.completeTraining(4L, 2L);
+
+        verify(assignment).markCompleted();
+        verify(assignmentRepository).save(assignment);
+    }
+
+    @Test
+    void doesNotCompleteTrainingNotAssignedToLearner() {
+        when(assignmentRepository.findByTrainingIdAndLearnerId(2L, 4L))
+                .thenReturn(Optional.empty());
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> trainingService.completeTraining(4L, 2L)
+        );
+
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        verify(assignmentRepository, never()).save(any());
+    }
 
     @Test
     void returnsEmptyListWhenLearnerHasNoAssignments() {

@@ -61,6 +61,50 @@ class TrainingAssignmentRepositoryTest {
     }
 
     @Test
+    void findsAssignmentOnlyForMatchingTrainingAndLearnerAndPersistsCompletion() {
+        User learnerA = new User("Completion Test A", Role.LEARNER);
+        User learnerB = new User("Completion Test B", Role.LEARNER);
+        entityManager.persist(learnerA);
+        entityManager.persist(learnerB);
+
+        Training training = new Training("Completion Test Training", learnerA);
+        entityManager.persist(training);
+        TrainingAssignment assignmentA = new TrainingAssignment(training, learnerA);
+        TrainingAssignment assignmentB = new TrainingAssignment(training, learnerB);
+        entityManager.persist(assignmentA);
+        entityManager.persist(assignmentB);
+        entityManager.flush();
+
+        assertTrue(assignmentRepository
+                .findByTrainingIdAndLearnerId(training.getId(), learnerA.getId())
+                .isPresent());
+        assertTrue(assignmentRepository
+                .findByTrainingIdAndLearnerId(training.getId(), 999999L)
+                .isEmpty());
+
+        TrainingAssignment learnerAssignment = assignmentRepository
+                .findByTrainingIdAndLearnerId(training.getId(), learnerA.getId())
+                .orElseThrow();
+        learnerAssignment.markCompleted();
+        var firstCompletionTimestamp = learnerAssignment.getCompletedAt();
+        learnerAssignment.markCompleted();
+        assertEquals(firstCompletionTimestamp, learnerAssignment.getCompletedAt());
+        entityManager.flush();
+        entityManager.clear();
+
+        TrainingAssignment reloaded = assignmentRepository
+                .findByTrainingIdAndLearnerId(training.getId(), learnerA.getId())
+                .orElseThrow();
+        assertTrue(reloaded.isCompleted());
+        assertNotNull(reloaded.getCompletedAt());
+
+        TrainingAssignment otherLearnerAssignment = assignmentRepository
+                .findByTrainingIdAndLearnerId(training.getId(), learnerB.getId())
+                .orElseThrow();
+        assertFalse(otherLearnerAssignment.isCompleted());
+    }
+
+    @Test
     void returnsEmptyListForLearnerWithoutAssignments() {
         User learner = new User("Repository Test Empty", Role.LEARNER);
         entityManager.persist(learner);
