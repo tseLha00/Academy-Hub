@@ -34,11 +34,15 @@ class TrainingControllerTest {
     }
 
     private AcademyUserPrincipal learner() {
-        return new AcademyUserPrincipal(4L, "learner", "hash", "Test Learner", Role.LEARNER);
+        return new AcademyUserPrincipal(
+                4L, "learner", "hash", "Test", "Learner", Role.LEARNER
+        );
     }
 
     private AcademyUserPrincipal admin() {
-        return new AcademyUserPrincipal(6L, "admin", "hash", "Test Admin", Role.ADMIN);
+        return new AcademyUserPrincipal(
+                6L, "admin", "hash", "Test", "Admin", Role.ADMIN
+        );
     }
 
     @Test

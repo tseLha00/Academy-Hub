@@ -20,7 +20,7 @@ class AcademyUserDetailsServiceTest {
     @Test
     void loadsUserAndMapsRoleToAuthority() {
         User user = new User(
-                "Test Learner", Role.LEARNER, "learner.one", "$2a$12$hashed-password"
+                "Test", "Learner", Role.LEARNER, "learner.one", "$2a$12$hashed-password"
         );
         when(userRepository.findByUsername("learner.one"))
                 .thenReturn(Optional.of(user));
@@ -29,7 +29,9 @@ class AcademyUserDetailsServiceTest {
                 userDetailsService.loadUserByUsername("  LEARNER.ONE  ");
 
         assertEquals("learner.one", principal.getUsername());
-        assertEquals("Test Learner", principal.getDisplayName());
+        assertEquals("Test", principal.getFirstName());
+        assertEquals("Learner", principal.getLastName());
+        assertEquals("Test Learner", principal.getFullName());
         assertEquals(Role.LEARNER, principal.getRole());
         assertTrue(principal.getAuthorities().stream()
                 .anyMatch(authority -> authority.getAuthority().equals("ROLE_LEARNER")));
@@ -37,7 +39,7 @@ class AcademyUserDetailsServiceTest {
 
     @Test
     void rejectsUserWithoutProvisionedCredentials() {
-        User user = new User("Legacy Learner", Role.LEARNER);
+        User user = new User("Legacy", "Learner", Role.LEARNER);
         when(userRepository.findByUsername("legacy.learner"))
                 .thenReturn(Optional.of(user));
 

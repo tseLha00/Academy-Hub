@@ -26,8 +26,8 @@ class TrainingAssignmentRepositoryTest {
 
     @Test
     void returnsOnlyRequestedLearnersAssignmentsSortedByTrainingName() {
-        User learnerA = new User("Repository Test A", Role.LEARNER);
-        User learnerB = new User("Repository Test B", Role.LEARNER);
+        User learnerA = new User("Repository", "Test A", Role.LEARNER);
+        User learnerB = new User("Repository", "Test B", Role.LEARNER);
         entityManager.persist(learnerA);
         entityManager.persist(learnerB);
 
@@ -62,8 +62,8 @@ class TrainingAssignmentRepositoryTest {
 
     @Test
     void findsAssignmentOnlyForMatchingTrainingAndLearnerAndPersistsCompletion() {
-        User learnerA = new User("Completion Test A", Role.LEARNER);
-        User learnerB = new User("Completion Test B", Role.LEARNER);
+        User learnerA = new User("Completion Test", "A", Role.LEARNER);
+        User learnerB = new User("Completion Test", "B", Role.LEARNER);
         entityManager.persist(learnerA);
         entityManager.persist(learnerB);
 
@@ -108,7 +108,7 @@ class TrainingAssignmentRepositoryTest {
 
     @Test
     void persistsPartialProgressForLearnerAssignment() {
-        User learner = new User("Progress Test Learner", Role.LEARNER);
+        User learner = new User("Progress Test", "Learner", Role.LEARNER);
         entityManager.persist(learner);
         Training training = new Training("Progress Test Training", learner);
         entityManager.persist(training);
@@ -129,7 +129,7 @@ class TrainingAssignmentRepositoryTest {
 
     @Test
     void rejectsProgressOutsideZeroToOneHundred() {
-        User learner = new User("Invalid Progress Learner", Role.LEARNER);
+        User learner = new User("Invalid Progress", "Learner", Role.LEARNER);
         entityManager.persist(learner);
         Training training = new Training("Invalid Progress Training", learner);
         entityManager.persist(training);
@@ -142,7 +142,7 @@ class TrainingAssignmentRepositoryTest {
 
     @Test
     void settingProgressToOneHundredMarksAssignmentCompleted() {
-        User learner = new User("Complete Progress Learner", Role.LEARNER);
+        User learner = new User("Complete Progress", "Learner", Role.LEARNER);
         entityManager.persist(learner);
         Training training = new Training("Complete Progress Training", learner);
         entityManager.persist(training);
@@ -157,7 +157,7 @@ class TrainingAssignmentRepositoryTest {
 
     @Test
     void completedAssignmentCannotBeMovedBackwards() {
-        User learner = new User("Backward Progress Learner", Role.LEARNER);
+        User learner = new User("Backward Progress", "Learner", Role.LEARNER);
         entityManager.persist(learner);
         Training training = new Training("Backward Progress Training", learner);
         entityManager.persist(training);
@@ -172,7 +172,7 @@ class TrainingAssignmentRepositoryTest {
 
     @Test
     void returnsEmptyListForLearnerWithoutAssignments() {
-        User learner = new User("Repository Test Empty", Role.LEARNER);
+        User learner = new User("Repository Test", "Empty", Role.LEARNER);
         entityManager.persist(learner);
         entityManager.flush();
         entityManager.clear();
