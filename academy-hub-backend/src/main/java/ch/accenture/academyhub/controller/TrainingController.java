@@ -3,6 +3,7 @@ package ch.accenture.academyhub.controller;
 import ch.accenture.academyhub.dto.CreateTrainingRequest;
 import ch.accenture.academyhub.dto.TrainingDetailsResponse;
 import ch.accenture.academyhub.dto.TrainingResponse;
+import ch.accenture.academyhub.dto.UpdateTrainingProgressRequest;
 import ch.accenture.academyhub.dto.UpdateTrainingAssignmentsRequest;
 import ch.accenture.academyhub.dto.UpdateTrainingRequest;
 import ch.accenture.academyhub.security.AcademyUserPrincipal;
@@ -50,6 +51,20 @@ public class TrainingController {
             @PathVariable Long trainingId
     ) {
         trainingService.completeTraining(principal.getId(), trainingId);
+    }
+
+    /** A learner can update progress only for their own assigned training. */
+    @PutMapping("/trainings/{trainingId}/progress")
+    @PreAuthorize("hasRole('LEARNER')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateTrainingProgress(
+            @AuthenticationPrincipal AcademyUserPrincipal principal,
+            @PathVariable Long trainingId,
+            @Valid @RequestBody UpdateTrainingProgressRequest request
+    ) {
+        trainingService.updateTrainingProgress(
+                principal.getId(), trainingId, request.progressPercentage()
+        );
     }
 
     /** Admin-only learner lookup, used by administrative workflows. */

@@ -3,6 +3,7 @@ package ch.accenture.academyhub.controller;
 import ch.accenture.academyhub.dto.CreateTrainingRequest;
 import ch.accenture.academyhub.dto.TrainingDetailsResponse;
 import ch.accenture.academyhub.dto.TrainingResponse;
+import ch.accenture.academyhub.dto.UpdateTrainingProgressRequest;
 import ch.accenture.academyhub.dto.UpdateTrainingAssignmentsRequest;
 import ch.accenture.academyhub.dto.UpdateTrainingRequest;
 import ch.accenture.academyhub.entity.Role;
@@ -44,7 +45,7 @@ class TrainingControllerTest {
     void learnerRetrievesTrainingsUsingAuthenticatedIdentity() {
         Instant completedAt = Instant.parse("2026-10-20T10:00:00Z");
         List<TrainingResponse> expected = List.of(new TrainingResponse(
-                3L, 2L, "Java Fundamentals", true, completedAt
+                3L, 2L, "Java Fundamentals", true, completedAt, 100
         ));
         when(trainingService.getTrainingsForLearner(4L)).thenReturn(expected);
 
@@ -56,6 +57,14 @@ class TrainingControllerTest {
     void learnerCanCompleteTrainingUsingAuthenticatedIdentity() {
         controller.completeTraining(learner(), 2L);
         verify(trainingService).completeTraining(4L, 2L);
+    }
+
+    @Test
+    void learnerUpdatesProgressUsingAuthenticatedIdentity() {
+        controller.updateTrainingProgress(
+                learner(), 2L, new UpdateTrainingProgressRequest(65)
+        );
+        verify(trainingService).updateTrainingProgress(4L, 2L, 65);
     }
 
     @Test

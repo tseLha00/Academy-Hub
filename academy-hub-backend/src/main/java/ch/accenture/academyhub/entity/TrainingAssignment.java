@@ -38,6 +38,9 @@ public class TrainingAssignment {
     @Column(name = "completed_at")
     private Instant completedAt;
 
+    @Column(name = "progress_percentage", nullable = false)
+    private int progressPercentage;
+
     protected TrainingAssignment() {
         // Required by JPA.
     }
@@ -67,10 +70,30 @@ public class TrainingAssignment {
         return completedAt != null;
     }
 
+    public int getProgressPercentage() {
+        return progressPercentage;
+    }
+
+    /** Updates progress; a completed assignment cannot be moved backwards. */
+    public void updateProgressPercentage(int progressPercentage) {
+        if (progressPercentage < 0 || progressPercentage > 100) {
+            throw new IllegalArgumentException("Progress must be between 0 and 100");
+        }
+        if (isCompleted() && progressPercentage < 100) {
+            throw new IllegalStateException("Completed training progress cannot be reduced");
+        }
+
+        this.progressPercentage = progressPercentage;
+        if (progressPercentage == 100) {
+            markCompleted();
+        }
+    }
+
     /** Marks this learner's assignment as completed without overwriting its original timestamp. */
     public void markCompleted() {
         if (completedAt == null) {
             completedAt = Instant.now();
         }
+        progressPercentage = 100;
     }
 }
