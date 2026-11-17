@@ -66,4 +66,11 @@ public class TrainingAssignment {
     public boolean isCompleted() {
         return completedAt != null;
     }
+
+    /** Marks this learner's assignment as completed without overwriting its original timestamp. */
+    public void markCompleted() {
+        if (completedAt == null) {
+            completedAt = Instant.now();
+        }
+    }
 }
