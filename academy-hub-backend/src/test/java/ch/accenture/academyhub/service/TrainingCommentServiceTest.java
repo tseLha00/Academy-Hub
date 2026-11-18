@@ -103,6 +103,8 @@ class TrainingCommentServiceTest {
 
     @Test
     void learnerCannotAddCommentToAnotherLearnersAssignment() {
+        long commentsBefore = commentRepository.count();
+
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
                 () -> commentService.addComment(
@@ -114,7 +116,7 @@ class TrainingCommentServiceTest {
         );
 
         assertEquals(404, exception.getStatusCode().value());
-        assertEquals(0, commentRepository.count());
+        assertEquals(commentsBefore, commentRepository.count());
     }
 
     @Test
