@@ -33,7 +33,8 @@ public class AcademyUserDetailsService implements UserDetailsService {
                 user.getId(),
                 user.getUsername(),
                 user.getPasswordHash(),
-                user.getDisplayName(),
+                user.getFirstName(),
+                user.getLastName(),
                 user.getRole()
         );
     }

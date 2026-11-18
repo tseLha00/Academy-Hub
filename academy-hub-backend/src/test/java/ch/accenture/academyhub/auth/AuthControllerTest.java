@@ -35,7 +35,7 @@ class AuthControllerTest {
     @Test
     void loginAuthenticatesAndCreatesSession() {
         AcademyUserPrincipal principal = new AcademyUserPrincipal(
-                7L, "admin.one", "encoded-password", "Admin One", Role.ADMIN
+                7L, "admin.one", "encoded-password", "Admin", "One", Role.ADMIN
         );
         Authentication authenticated = UsernamePasswordAuthenticationToken.authenticated(
                 principal, null, principal.getAuthorities()

@@ -98,7 +98,9 @@ public class AuthController {
         return new AuthenticatedUserResponse(
                 principal.getId(),
                 principal.getUsername(),
-                principal.getDisplayName(),
+                principal.getFirstName(),
+                principal.getLastName(),
+                principal.getFullName(),
                 principal.getRole()
         );
     }
