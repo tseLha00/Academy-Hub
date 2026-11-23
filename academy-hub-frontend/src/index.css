@@ -1,0 +1,45 @@
+:root {
+  --color-bg: #f7f7fa;
+  --color-surface: #ffffff;
+  --color-text: #1a1a2e;
+  --color-muted: #6b6b80;
+  --color-border: #e4e4ec;
+  --color-primary: #6d28d9;
+  --color-primary-hover: #5b21b6;
+  --color-primary-soft: #ede9fe;
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --topbar-height: 72px;
+  --sidebar-width: 200px;
+
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
