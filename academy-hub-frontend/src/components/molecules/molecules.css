@@ -26,12 +26,9 @@
   gap: 0.65rem;
   width: 100%;
   padding: 0.5rem 0.6rem;
-  border: none;
   border-radius: var(--radius-md);
-  background: transparent;
   color: var(--color-text);
   text-decoration: none;
-  cursor: pointer;
 }
 
 .nav-item:hover {
@@ -59,13 +56,10 @@
 
 .language-switcher button {
   padding: 0.2rem 0.55rem;
-  border: none;
   border-radius: var(--radius-sm);
-  background: transparent;
   color: var(--color-muted);
   font-size: 0.8rem;
   font-weight: 600;
-  cursor: pointer;
 }
 
 .language-switcher button[aria-pressed='true'] {

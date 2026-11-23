@@ -44,9 +44,6 @@
   position: relative;
   display: inline-flex;
   padding: 0.35rem;
-  border: none;
-  background: transparent;
-  cursor: pointer;
 }
 
 .topbar-bell::after {
@@ -70,11 +67,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0;
-  border: none;
-  background: transparent;
   font-weight: 600;
-  cursor: pointer;
 }
 
 .user-menu-avatar {
