@@ -57,6 +57,7 @@ src/
     molecules/   groups of atoms: form field (label + input), search field ...
     organisms/   page sections: top bar, sidebar, form cards ...
     templates/   page frames, e.g. layout with top bar + sidebar
+    images/      images used by components, e.g. Logo.jpg
   pages/         one component per route, fills a template with organisms
   i18n/          language setup and texts (locales/de.ts, locales/en.ts)
   test/          test setup
