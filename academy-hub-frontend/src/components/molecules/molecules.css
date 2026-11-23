@@ -1,0 +1,68 @@
+/* ---------- SearchField ---------- */
+
+.search-field {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: min(320px, 100%);
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-md);
+  background-color: var(--color-primary-soft);
+  color: var(--color-muted);
+}
+
+.search-field input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+}
+
+/* ---------- NavItem ---------- */
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.nav-item:hover {
+  background-color: var(--color-bg);
+}
+
+.nav-item.active {
+  background-color: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.nav-item-small {
+  font-size: 0.85rem;
+}
+
+/* ---------- LanguageSwitcher ---------- */
+
+.language-switcher {
+  display: inline-flex;
+  padding: 2px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.language-switcher button {
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-sm);
+  color: var(--color-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.language-switcher button[aria-pressed='true'] {
+  background-color: var(--color-primary-soft);
+  color: var(--color-primary);
+}
