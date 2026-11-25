@@ -134,6 +134,7 @@ class TrainingServiceTest {
                         3L,
                         2L,
                         "Java Fundamentals",
+                        null,
                         false,
                         null,
                         0
@@ -169,6 +170,7 @@ class TrainingServiceTest {
                         3L,
                         2L,
                         "Java Fundamentals",
+                        null,
                         true,
                         completedAt,
                         100

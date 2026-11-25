@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 public record UpdateTrainingRequest(
         @NotBlank
         @Size(max = 200)
-        String name
+        String name,
+        String description
 ) {
 }

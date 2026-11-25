@@ -6,6 +6,7 @@ public record TrainingResponse(
         Long assignmentId,
         Long trainingId,
         String name,
+        String description,
         boolean completed,
         Instant completedAt,
         int progressPercentage

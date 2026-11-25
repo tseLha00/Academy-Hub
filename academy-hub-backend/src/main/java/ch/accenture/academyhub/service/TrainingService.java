@@ -61,6 +61,7 @@ public class TrainingService {
                         assignment.getId(),
                         assignment.getTraining().getId(),
                         assignment.getTraining().getName(),
+                        assignment.getTraining().getDescription(),
                         assignment.isCompleted(),
                         assignment.getCompletedAt(),
                         assignment.getProgressPercentage()

@@ -12,6 +12,7 @@ public record CreateTrainingRequest(
         @NotBlank
         @Size(max = 200)
         String name,
+        String description,
 
         @NotNull
         Set<@NotNull @Positive Long> learnerIds

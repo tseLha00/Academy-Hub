@@ -106,6 +106,7 @@ class TrainingProgressSecurityTest {
                         3L,
                         2L,
                         "Java Fundamentals",
+                        null,
                         false,
                         null,
                         65
@@ -114,6 +115,7 @@ class TrainingProgressSecurityTest {
                         5L,
                         4L,
                         "Spring Boot",
+                        null,
                         true,
                         completedAt,
                         100

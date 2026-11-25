@@ -92,7 +92,7 @@ public class TrainingManagementService {
         }
 
         Training training = trainingRepository.save(
-                new Training(request.name().strip(), actor)
+                new Training(request.name().strip(), request.description(), actor)
         );
 
         List<TrainingAssignment> assignments = learners.stream()
@@ -104,6 +104,7 @@ public class TrainingManagementService {
         return new TrainingDetailsResponse(
                 training.getId(),
                 training.getName(),
+                training.getDescription(),
                 actor.getId(),
                 learners.stream()
                         .map(User::getId)
@@ -134,6 +135,7 @@ public class TrainingManagementService {
         boolean isLearnerCreator =
                 actor.getRole() == Role.LEARNER
                         && training.getCreatedBy().getId().equals(actor.getId());
+        boolean isCreator = training.getCreatedBy().getId().equals(actor.getId());
 
         if (!isAdmin && !isLearnerCreator) {
             throw new ResponseStatusException(
@@ -142,7 +144,19 @@ public class TrainingManagementService {
             );
         }
 
+        if (request.description() != null && !isCreator) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Only the training creator can edit its description"
+            );
+        }
+
         training.rename(request.name().strip());
+        if (request.description() != null) {
+            training.updateDescription(
+                    request.description().isBlank() ? null : request.description()
+            );
+        }
     }
 
     @Transactional

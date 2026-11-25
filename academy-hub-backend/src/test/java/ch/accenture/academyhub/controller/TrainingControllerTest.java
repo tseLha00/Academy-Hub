@@ -49,7 +49,7 @@ class TrainingControllerTest {
     void learnerRetrievesTrainingsUsingAuthenticatedIdentity() {
         Instant completedAt = Instant.parse("2026-10-20T10:00:00Z");
         List<TrainingResponse> expected = List.of(new TrainingResponse(
-                3L, 2L, "Java Fundamentals", true, completedAt, 100
+                3L, 2L, "Java Fundamentals", null, true, completedAt, 100
         ));
         when(trainingService.getTrainingsForLearner(4L)).thenReturn(expected);
 
@@ -81,9 +81,9 @@ class TrainingControllerTest {
 
     @Test
     void adminCreatesTrainingUsingAuthenticatedIdentity() {
-        CreateTrainingRequest request = new CreateTrainingRequest("Java Practice", Set.of(4L));
+        CreateTrainingRequest request = new CreateTrainingRequest("Java Practice", null, Set.of(4L));
         TrainingDetailsResponse expected = new TrainingDetailsResponse(
-                40L, "Java Practice", 6L, List.of(4L)
+                40L, "Java Practice", null, 6L, List.of(4L)
         );
         when(managementService.createTraining(6L, request)).thenReturn(expected);
 
@@ -95,8 +95,8 @@ class TrainingControllerTest {
 
     @Test
     void adminCanUpdateTraining() {
-        controller.updateTraining(admin(), 40L, new UpdateTrainingRequest("Updated Name"));
-        verify(managementService).updateTraining(6L, 40L, new UpdateTrainingRequest("Updated Name"));
+        controller.updateTraining(admin(), 40L, new UpdateTrainingRequest("Updated Name", null));
+        verify(managementService).updateTraining(6L, 40L, new UpdateTrainingRequest("Updated Name", null));
     }
 
     @Test

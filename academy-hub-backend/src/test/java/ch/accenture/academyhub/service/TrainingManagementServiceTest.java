@@ -48,7 +48,7 @@ class TrainingManagementServiceTest {
 
         TrainingDetailsResponse response = managementService.createTraining(
                 learner.getId(),
-                new CreateTrainingRequest("  Java Practice  ", Set.of())
+                new CreateTrainingRequest("  Java Practice  ", null, Set.of())
         );
 
         entityManager.flush();
@@ -79,6 +79,7 @@ class TrainingManagementServiceTest {
                 admin.getId(),
                 new CreateTrainingRequest(
                         "Shared Training",
+                        null,
                         Set.of(learnerA.getId(), learnerB.getId())
                 )
         );
@@ -112,7 +113,7 @@ class TrainingManagementServiceTest {
 
         TrainingDetailsResponse response = managementService.createTraining(
                 admin.getId(),
-                new CreateTrainingRequest("Unassigned Training", Set.of())
+                new CreateTrainingRequest("Unassigned Training", null, Set.of())
         );
 
         entityManager.flush();
@@ -135,6 +136,7 @@ class TrainingManagementServiceTest {
                         learner.getId(),
                         new CreateTrainingRequest(
                                 "Forbidden Assignment",
+                                null,
                                 Set.of(other.getId())
                         )
                 )
@@ -155,6 +157,7 @@ class TrainingManagementServiceTest {
                         admin.getId(),
                         new CreateTrainingRequest(
                                 "Invalid Assignment",
+                                null,
                                 Set.of(otherAdmin.getId())
                         )
                 )
@@ -179,6 +182,7 @@ class TrainingManagementServiceTest {
                         admin.getId(),
                         new CreateTrainingRequest(
                                 "Missing Learner",
+                                null,
                                 Set.of(missingId)
                         )
                 )
@@ -195,7 +199,7 @@ class TrainingManagementServiceTest {
                 ConstraintViolationException.class,
                 () -> managementService.createTraining(
                         learner.getId(),
-                        new CreateTrainingRequest("   ", Set.of())
+                        new CreateTrainingRequest("   ", null, Set.of())
                 )
         );
     }
@@ -208,7 +212,7 @@ class TrainingManagementServiceTest {
                 ConstraintViolationException.class,
                 () -> managementService.createTraining(
                         learner.getId(),
-                        new CreateTrainingRequest("a".repeat(201), Set.of())
+                        new CreateTrainingRequest("a".repeat(201), null, Set.of())
                 )
         );
     }
@@ -219,13 +223,13 @@ class TrainingManagementServiceTest {
 
         TrainingDetailsResponse created = managementService.createTraining(
                 learner.getId(),
-                new CreateTrainingRequest("Original Name", Set.of())
+                new CreateTrainingRequest("Original Name", null, Set.of())
         );
 
         managementService.updateTraining(
                 learner.getId(),
                 created.trainingId(),
-                new UpdateTrainingRequest("  Updated Name  ")
+                new UpdateTrainingRequest("  Updated Name  ", null)
         );
 
         entityManager.flush();
@@ -249,6 +253,7 @@ class TrainingManagementServiceTest {
                 admin.getId(),
                 new CreateTrainingRequest(
                         "Original Shared Name",
+                        null,
                         Set.of(learnerA.getId(), learnerB.getId())
                 )
         );
@@ -273,7 +278,7 @@ class TrainingManagementServiceTest {
         managementService.updateTraining(
                 admin.getId(),
                 created.trainingId(),
-                new UpdateTrainingRequest("Updated Shared Name")
+                new UpdateTrainingRequest("Updated Shared Name", null)
         );
 
         entityManager.flush();
@@ -300,7 +305,7 @@ class TrainingManagementServiceTest {
 
         TrainingDetailsResponse created = managementService.createTraining(
                 owner.getId(),
-                new CreateTrainingRequest("Original Name", Set.of())
+                new CreateTrainingRequest("Original Name", null, Set.of())
         );
 
         ResponseStatusException exception = assertThrows(
@@ -308,7 +313,7 @@ class TrainingManagementServiceTest {
                 () -> managementService.updateTraining(
                         other.getId(),
                         created.trainingId(),
-                        new UpdateTrainingRequest("Unauthorized Name")
+                        new UpdateTrainingRequest("Unauthorized Name", null)
                 )
         );
 
@@ -327,7 +332,7 @@ class TrainingManagementServiceTest {
 
         TrainingDetailsResponse created = managementService.createTraining(
                 learner.getId(),
-                new CreateTrainingRequest("Original Name", Set.of())
+                new CreateTrainingRequest("Original Name", null, Set.of())
         );
 
         assertThrows(
@@ -335,7 +340,7 @@ class TrainingManagementServiceTest {
                 () -> managementService.updateTraining(
                         learner.getId(),
                         created.trainingId(),
-                        new UpdateTrainingRequest("   ")
+                        new UpdateTrainingRequest("   ", null)
                 )
         );
     }
@@ -351,6 +356,7 @@ class TrainingManagementServiceTest {
                 admin.getId(),
                 new CreateTrainingRequest(
                         "Assignment Changes",
+                        null,
                         Set.of(retained.getId(), removed.getId())
                 )
         );
@@ -416,6 +422,7 @@ class TrainingManagementServiceTest {
                 admin.getId(),
                 new CreateTrainingRequest(
                         "Reassignment",
+                        null,
                         Set.of(learner.getId())
                 )
         );
@@ -465,7 +472,7 @@ class TrainingManagementServiceTest {
 
         TrainingDetailsResponse created = managementService.createTraining(
                 learner.getId(),
-                new CreateTrainingRequest("Personal Training", Set.of())
+                new CreateTrainingRequest("Personal Training", null, Set.of())
         );
 
         ResponseStatusException exception = assertThrows(
@@ -489,6 +496,7 @@ class TrainingManagementServiceTest {
                 admin.getId(),
                 new CreateTrainingRequest(
                         "Preserved Assignments",
+                        null,
                         Set.of(learner.getId())
                 )
         );
@@ -525,6 +533,7 @@ class TrainingManagementServiceTest {
                 admin.getId(),
                 new CreateTrainingRequest(
                         "Training To Delete",
+                        null,
                         Set.of(learner.getId())
                 )
         );
@@ -560,7 +569,7 @@ class TrainingManagementServiceTest {
 
         TrainingDetailsResponse created = managementService.createTraining(
                 learner.getId(),
-                new CreateTrainingRequest("Assigned Personal Training", Set.of())
+                new CreateTrainingRequest("Assigned Personal Training", null, Set.of())
         );
 
         ResponseStatusException exception = assertThrows(
@@ -588,7 +597,7 @@ class TrainingManagementServiceTest {
 
         TrainingDetailsResponse created = managementService.createTraining(
                 learner.getId(),
-                new CreateTrainingRequest("Unassigned Personal Training", Set.of())
+                new CreateTrainingRequest("Unassigned Personal Training", null, Set.of())
         );
 
         managementService.updateAssignments(
@@ -618,7 +627,7 @@ class TrainingManagementServiceTest {
 
         TrainingDetailsResponse created = managementService.createTraining(
                 admin.getId(),
-                new CreateTrainingRequest("Protected Training", Set.of())
+                new CreateTrainingRequest("Protected Training", null, Set.of())
         );
 
         ResponseStatusException exception = assertThrows(
