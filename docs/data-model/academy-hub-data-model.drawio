@@ -1,0 +1,235 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" type="device" version="24.7.17">
+  <diagram name="Academy Hub data model" id="page-0">
+    <mxGraphModel dx="1700" dy="1600" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1700" pageHeight="1600" arrows="1">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="Academy Hub | Data model" vertex="1" parent="1" style="text;html=0;align=left;verticalAlign=top;whiteSpace=wrap;overflow=hidden;fontFamily=Arial;fontSize=30;fontColor=#172554;">
+          <mxGeometry x="40" y="25" width="1600" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="Target design after tech-lead feedback. Existing structures plus planned changes in purple; one sheet. Updated 20 Nov 2026." vertex="1" parent="1" style="text;html=0;align=left;verticalAlign=top;whiteSpace=wrap;overflow=hidden;fontFamily=Arial;fontSize=15;fontColor=#64748B;">
+          <mxGeometry x="40" y="88" width="1600" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="user" value="User  /  users" vertex="1" parent="1" style="swimlane;html=0;startSize=44;horizontal=1;rounded=1;arcSize=5;whiteSpace=wrap;fontFamily=Arial;fontSize=17;fontStyle=1;fontColor=#FFFFFF;fillColor=#172554;swimlaneFillColor=#FFFFFF;strokeColor=#172554;dashed=0;">
+          <mxGeometry x="40" y="170" width="440" height="350" as="geometry" />
+        </mxCell>
+        <mxCell id="user-row0" value="PK id                 BIGINT          NN" vertex="1" parent="user" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="44" width="440" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="user-row1" value="   first_name         VARCHAR(75)     NN" vertex="1" parent="user" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="74" width="440" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="user-row2" value="   last_name          VARCHAR(75)     NN" vertex="1" parent="user" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="104" width="440" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="user-row3" value="   role               VARCHAR(20)     NN" vertex="1" parent="user" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="134" width="440" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="user-row4" value="UQ username           VARCHAR(80)      ?" vertex="1" parent="user" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="164" width="440" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="user-row5" value="   password_hash      VARCHAR(255)     ?" vertex="1" parent="user" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="194" width="440" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="user-row6" value="   email              VARCHAR(254)     ?" vertex="1" parent="user" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="224" width="440" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="user-row7" value="   location           VARCHAR(100)     ?" vertex="1" parent="user" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="254" width="440" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="user-row8" value="   profession         VARCHAR(150)     ?" vertex="1" parent="user" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="284" width="440" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="user-row9" value="   apprenticeship_year INTEGER        ?" vertex="1" parent="user" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="314" width="440" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="training" value="Training  /  trainings" vertex="1" parent="1" style="swimlane;html=0;startSize=44;horizontal=1;rounded=1;arcSize=5;whiteSpace=wrap;fontFamily=Arial;fontSize=17;fontStyle=1;fontColor=#FFFFFF;fillColor=#172554;swimlaneFillColor=#FFFFFF;strokeColor=#172554;dashed=0;">
+          <mxGeometry x="650" y="170" width="390" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="training-row0" value="PK id             BIGINT        NN" vertex="1" parent="training" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="44" width="390" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="training-row1" value="   name           VARCHAR(200)  NN" vertex="1" parent="training" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="74" width="390" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="training-row2" value="FK created_by     BIGINT        NN" vertex="1" parent="training" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="104" width="390" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="training-row3" value="   description    TEXT           ?" vertex="1" parent="training" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#7C3AED;">
+          <mxGeometry x="0" y="134" width="390" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="assignment" value="TrainingAssignment  /  training_assignments" vertex="1" parent="1" style="swimlane;html=0;startSize=44;horizontal=1;rounded=1;arcSize=5;whiteSpace=wrap;fontFamily=Arial;fontSize=17;fontStyle=1;fontColor=#FFFFFF;fillColor=#172554;swimlaneFillColor=#FFFFFF;strokeColor=#172554;dashed=0;">
+          <mxGeometry x="650" y="500" width="450" height="260" as="geometry" />
+        </mxCell>
+        <mxCell id="assignment-row0" value="PK id                   BIGINT       NN" vertex="1" parent="assignment" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="44" width="450" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="assignment-row1" value="FK training_id          BIGINT       NN" vertex="1" parent="assignment" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="74" width="450" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="assignment-row2" value="FK learner_id           BIGINT       NN" vertex="1" parent="assignment" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="104" width="450" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="assignment-row3" value="   completed_at         TIMESTAMPTZ    ?" vertex="1" parent="assignment" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="134" width="450" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="assignment-row4" value="   learning_status      VARCHAR(20)  NN" vertex="1" parent="assignment" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#7C3AED;">
+          <mxGeometry x="0" y="164" width="450" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="assignment-row5" value="   start_date           DATE          ?" vertex="1" parent="assignment" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#7C3AED;">
+          <mxGeometry x="0" y="194" width="450" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="assignment-row6" value="   estimated_completion_date DATE     ?" vertex="1" parent="assignment" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#7C3AED;">
+          <mxGeometry x="0" y="224" width="450" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="comment" value="TrainingComment  /  training_comments" vertex="1" parent="1" style="swimlane;html=0;startSize=44;horizontal=1;rounded=1;arcSize=5;whiteSpace=wrap;fontFamily=Arial;fontSize=17;fontStyle=1;fontColor=#FFFFFF;fillColor=#172554;swimlaneFillColor=#FFFFFF;strokeColor=#172554;dashed=0;">
+          <mxGeometry x="1210" y="500" width="440" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="comment-row0" value="PK id                BIGINT       NN" vertex="1" parent="comment" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="44" width="440" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="comment-row1" value="FK assignment_id     BIGINT       NN" vertex="1" parent="comment" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="74" width="440" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="comment-row2" value="FK author_id         BIGINT       NN" vertex="1" parent="comment" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="104" width="440" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="comment-row3" value="   content           TEXT         NN" vertex="1" parent="comment" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="134" width="440" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="comment-row4" value="   created_at        TIMESTAMPTZ  NN" vertex="1" parent="comment" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="164" width="440" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="vacation" value="Vacation  /  vacations" vertex="1" parent="1" style="swimlane;html=0;startSize=44;horizontal=1;rounded=1;arcSize=5;whiteSpace=wrap;fontFamily=Arial;fontSize=17;fontStyle=1;fontColor=#FFFFFF;fillColor=#7C3AED;swimlaneFillColor=#FFFFFF;strokeColor=#7C3AED;dashed=0;">
+          <mxGeometry x="40" y="700" width="440" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="vacation-row0" value="PK id             BIGINT        NN" vertex="1" parent="vacation" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="44" width="440" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="vacation-row1" value="FK user_id        BIGINT        NN" vertex="1" parent="vacation" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="74" width="440" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="vacation-row2" value="   start_date     DATE          NN" vertex="1" parent="vacation" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="104" width="440" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="vacation-row3" value="   end_date       DATE          NN" vertex="1" parent="vacation" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="134" width="440" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="vacation-row4" value="   status         VARCHAR(20)   NN" vertex="1" parent="vacation" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="164" width="440" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="news" value="News  /  news" vertex="1" parent="1" style="swimlane;html=0;startSize=44;horizontal=1;rounded=1;arcSize=5;whiteSpace=wrap;fontFamily=Arial;fontSize=17;fontStyle=1;fontColor=#FFFFFF;fillColor=#7C3AED;swimlaneFillColor=#FFFFFF;strokeColor=#7C3AED;dashed=0;">
+          <mxGeometry x="650" y="850" width="450" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="news-row0" value="PK id             BIGINT        NN" vertex="1" parent="news" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="44" width="450" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="news-row1" value="   title          VARCHAR(200)  NN" vertex="1" parent="news" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="74" width="450" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="news-row2" value="   description    TEXT          NN" vertex="1" parent="news" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="104" width="450" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="news-row3" value="   date           TIMESTAMPTZ   NN" vertex="1" parent="news" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="134" width="450" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="event" value="Event  /  events" vertex="1" parent="1" style="swimlane;html=0;startSize=44;horizontal=1;rounded=1;arcSize=5;whiteSpace=wrap;fontFamily=Arial;fontSize=17;fontStyle=1;fontColor=#FFFFFF;fillColor=#7C3AED;swimlaneFillColor=#FFFFFF;strokeColor=#7C3AED;dashed=0;">
+          <mxGeometry x="1210" y="850" width="440" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="event-row0" value="PK id             BIGINT        NN" vertex="1" parent="event" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="44" width="440" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="event-row1" value="   title          VARCHAR(200)  NN" vertex="1" parent="event" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="74" width="440" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="event-row2" value="   date           TIMESTAMPTZ   NN" vertex="1" parent="event" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="104" width="440" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="event-row3" value="   description    TEXT          NN" vertex="1" parent="event" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;spacingLeft=14;fontFamily=Courier New;fontSize=12;fontColor=#1E293B;">
+          <mxGeometry x="0" y="134" width="440" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="creates" value="" edge="1" parent="1" source="user" target="training" style="edgeStyle=none;rounded=0;html=0;strokeColor=#64748B;strokeWidth=2;startArrow=ERmandOne;startFill=0;endArrow=ERzeroToMany;endFill=0;dashed=0;exitX=1.0;exitY=0.17142857142857143;exitDx=0;exitDy=0;entryX=0.0;entryY=0.35294117647058826;entryDx=0;entryDy=0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="creates-label" value="creates  1 : 0..*" vertex="1" parent="1" style="text;html=0;align=left;verticalAlign=top;whiteSpace=wrap;overflow=hidden;fontFamily=Arial;fontSize=12;fontColor=#64748B;">
+          <mxGeometry x="490" y="192" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="assigned" value="" edge="1" parent="1" source="user" target="assignment" style="edgeStyle=none;rounded=0;html=0;strokeColor=#64748B;strokeWidth=2;startArrow=ERmandOne;startFill=0;endArrow=ERzeroToMany;endFill=0;dashed=0;exitX=1.0;exitY=0.7714285714285715;exitDx=0;exitDy=0;entryX=0.0;entryY=0.34615384615384615;entryDx=0;entryDy=0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="555" y="440" />
+              <mxPoint x="555" y="590" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="assigned-label" value="learner  1 : 0..*" vertex="1" parent="1" style="text;html=0;align=left;verticalAlign=top;whiteSpace=wrap;overflow=hidden;fontFamily=Arial;fontSize=12;fontColor=#64748B;">
+          <mxGeometry x="490" y="405" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hasassignment" value="" edge="1" parent="1" source="training" target="assignment" style="edgeStyle=none;rounded=0;html=0;strokeColor=#64748B;strokeWidth=2;startArrow=ERmandOne;startFill=0;endArrow=ERzeroToMany;endFill=0;dashed=0;exitX=0.5;exitY=1.0;exitDx=0;exitDy=0;entryX=0.43333333333333335;entryY=0.0;entryDx=0;entryDy=0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="hasassignment-label" value="has assignments  1 : 0..*" vertex="1" parent="1" style="text;html=0;align=left;verticalAlign=top;whiteSpace=wrap;overflow=hidden;fontFamily=Arial;fontSize=12;fontColor=#64748B;">
+          <mxGeometry x="865" y="390" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="comments" value="" edge="1" parent="1" source="assignment" target="comment" style="edgeStyle=none;rounded=0;html=0;strokeColor=#64748B;strokeWidth=2;startArrow=ERmandOne;startFill=0;endArrow=ERzeroToMany;endFill=0;dashed=0;exitX=1.0;exitY=0.34615384615384615;exitDx=0;exitDy=0;entryX=0.0;entryY=0.45;entryDx=0;entryDy=0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="comments-label" value="has comments" vertex="1" parent="1" style="text;html=0;align=left;verticalAlign=top;whiteSpace=wrap;overflow=hidden;fontFamily=Arial;fontSize=12;fontColor=#64748B;">
+          <mxGeometry x="1105" y="547" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="comment-cardinality" value="1 : 0..*" vertex="1" parent="1" style="text;html=0;align=left;verticalAlign=top;whiteSpace=wrap;overflow=hidden;fontFamily=Arial;fontSize=12;fontColor=#64748B;">
+          <mxGeometry x="1120" y="605" width="100" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="authors" value="" edge="1" parent="1" source="user" target="comment" style="edgeStyle=none;rounded=0;html=0;strokeColor=#64748B;strokeWidth=2;startArrow=ERmandOne;startFill=0;endArrow=ERzeroToMany;endFill=0;dashed=0;exitX=0.0;exitY=0.5142857142857142;exitDx=0;exitDy=0;entryX=1.0;entryY=0.75;entryDx=0;entryDy=0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="20" y="350" />
+              <mxPoint x="20" y="1420" />
+              <mxPoint x="1670" y="1420" />
+              <mxPoint x="1670" y="650" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="authors-label" value="authors comments  1 : 0..*" vertex="1" parent="1" style="text;html=0;align=left;verticalAlign=top;whiteSpace=wrap;overflow=hidden;fontFamily=Arial;fontSize=12;fontColor=#64748B;">
+          <mxGeometry x="690" y="1440" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="vacations" value="" edge="1" parent="1" source="user" target="vacation" style="edgeStyle=none;rounded=0;html=0;strokeColor=#64748B;strokeWidth=2;startArrow=ERmandOne;startFill=0;endArrow=ERzeroToMany;endFill=0;dashed=0;exitX=0.5;exitY=1.0;exitDx=0;exitDy=0;entryX=0.5;entryY=0.0;entryDx=0;entryDy=0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="vacations-label" value="has vacations  1 : 0..*" vertex="1" parent="1" style="text;html=0;align=left;verticalAlign=top;whiteSpace=wrap;overflow=hidden;fontFamily=Arial;fontSize=12;fontColor=#64748B;">
+          <mxGeometry x="280" y="590" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="constraints-title" value="Training assignment rules" vertex="1" parent="1" style="text;html=0;align=left;verticalAlign=top;whiteSpace=wrap;overflow=hidden;fontFamily=Arial;fontSize=16;fontColor=#172554;">
+          <mxGeometry x="650" y="1080" width="550" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="constraints-body" value="UNIQUE (training_id, learner_id).&#10;Statuses: TODO, IN_PROGRESS, BLOCKED, COMPLETED.&#10;Proposed initial learning status: TODO.&#10;Estimate required on learner creation/submission.&#10;Admin assignments and legacy rows may lack dates.&#10;Learners maintain their own assignment status/dates.&#10;Estimate must not precede a supplied start date.&#10;COMPLETED records the actual completed_at.&#10;Reopen clears completed_at: awaiting confirmation.&#10;Individual percentage progress is removed.&#10;Overall completed-versus-total overview remains." vertex="1" parent="1" style="text;html=0;align=left;verticalAlign=top;whiteSpace=wrap;overflow=hidden;fontFamily=Arial;fontSize=13;fontColor=#64748B;">
+          <mxGeometry x="650" y="1114" width="550" height="253" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-title" value="Reading the model" vertex="1" parent="1" style="text;html=0;align=left;verticalAlign=top;whiteSpace=wrap;overflow=hidden;fontFamily=Arial;fontSize=16;fontColor=#172554;">
+          <mxGeometry x="40" y="990" width="550" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-body" value="PK = primary key; FK = foreign key; UQ = unique.&#10;NN = NOT NULL; ? = nullable / optional.&#10;1 : 0..* = one parent, zero or many child rows.&#10;Navy = existing entities and unchanged fields.&#10;Purple text/headers = planned changes/entities.&#10;Planned fields have proposed types and NN rules.&#10;? = storage nullable; API may require a value.&#10;User includes the profile extension from issue #45." vertex="1" parent="1" style="text;html=0;align=left;verticalAlign=top;whiteSpace=wrap;overflow=hidden;fontFamily=Arial;fontSize=13;fontColor=#64748B;">
+          <mxGeometry x="40" y="1024" width="550" height="184" as="geometry" />
+        </mxCell>
+        <mxCell id="notes-title" value="Other design rules and pending decisions" vertex="1" parent="1" style="text;html=0;align=left;verticalAlign=top;whiteSpace=wrap;overflow=hidden;fontFamily=Arial;fontSize=16;fontColor=#172554;">
+          <mxGeometry x="1210" y="1080" width="450" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="notes-body" value="DATE = calendar date; TIMESTAMPTZ = instant.&#10;Training description: optional plain text / URLs.&#10;Description edits: creator only (planned).&#10;Approval is separate from learning status.&#10;REQUESTED / APPROVED / REJECTED: workflow pending.&#10;Recommendation visibility/selection: pending.&#10;News date: publication; Event date: start (proposed).&#10;Vacation: start_date &lt;= end_date (proposed).&#10;Vacation status and News/Event links: to agree." vertex="1" parent="1" style="text;html=0;align=left;verticalAlign=top;whiteSpace=wrap;overflow=hidden;fontFamily=Arial;fontSize=13;fontColor=#64748B;">
+          <mxGeometry x="1210" y="1114" width="450" height="207" as="geometry" />
+        </mxCell>
+        <mxCell id="source" value="Source: project requirements, existing entities/V1-V6 design and agreed feedback. Purple changes are not yet implemented. Permissions are enforced by the application." vertex="1" parent="1" style="text;html=0;align=left;verticalAlign=top;whiteSpace=wrap;overflow=hidden;fontFamily=Arial;fontSize=12;fontColor=#64748B;">
+          <mxGeometry x="40" y="1520" width="1600" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

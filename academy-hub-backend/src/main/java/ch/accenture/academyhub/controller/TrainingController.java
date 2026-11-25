@@ -1,5 +1,8 @@
 package ch.accenture.academyhub.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import ch.accenture.academyhub.dto.CreateTrainingRequest;
 import ch.accenture.academyhub.dto.TrainingDetailsResponse;
 import ch.accenture.academyhub.dto.TrainingResponse;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "Trainings", description = "Learner assignments and admin training management.")
 @RestController
 @RequestMapping("/api")
 public class TrainingController {
@@ -34,31 +38,37 @@ public class TrainingController {
     }
 
     /** A learner can only retrieve their own assigned trainings. */
+    @Operation(summary = "Get my training assignments",
+            description = "LEARNER only. Returns the signed-in learner's assignments, including assignment IDs for comment requests. An empty list is valid.")
     @GetMapping("/trainings")
     @PreAuthorize("hasRole('LEARNER')")
     public List<TrainingResponse> getMyTrainings(
-            @AuthenticationPrincipal AcademyUserPrincipal principal
+            @Parameter(hidden = true) @AuthenticationPrincipal AcademyUserPrincipal principal
     ) {
         return trainingService.getTrainingsForLearner(principal.getId());
     }
 
     /** A learner can complete only a training assigned to their own account. */
+    @Operation(summary = "Complete my assigned training",
+            description = "LEARNER only. Uses a training ID, not an assignment ID. Returns 404 if no matching assignment exists. Repeating completion preserves its timestamp.")
     @PostMapping("/trainings/{trainingId}/complete")
     @PreAuthorize("hasRole('LEARNER')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void completeTraining(
-            @AuthenticationPrincipal AcademyUserPrincipal principal,
+            @Parameter(hidden = true) @AuthenticationPrincipal AcademyUserPrincipal principal,
             @PathVariable Long trainingId
     ) {
         trainingService.completeTraining(principal.getId(), trainingId);
     }
 
     /** A learner can update progress only for their own assigned training. */
+    @Operation(summary = "Update my training percentage",
+            description = "LEARNER only. Accepts 0-100; reaching 100 completes the assignment. Reducing a completed assignment returns 409. This is the current API; status/date replacement is a separate ticket.")
     @PutMapping("/trainings/{trainingId}/progress")
     @PreAuthorize("hasRole('LEARNER')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateTrainingProgress(
-            @AuthenticationPrincipal AcademyUserPrincipal principal,
+            @Parameter(hidden = true) @AuthenticationPrincipal AcademyUserPrincipal principal,
             @PathVariable Long trainingId,
             @Valid @RequestBody UpdateTrainingProgressRequest request
     ) {
@@ -68,6 +78,8 @@ public class TrainingController {
     }
 
     /** Admin-only learner lookup, used by administrative workflows. */
+    @Operation(summary = "Get a learner's assignments",
+            description = "ADMIN only. Returns the selected learner's assignments. An empty response does not distinguish a missing learner from a learner without assignments.")
     @GetMapping("/admin/learners/{learnerId}/trainings")
     @PreAuthorize("hasRole('ADMIN')")
     public List<TrainingResponse> getLearnerTrainings(
@@ -76,10 +88,13 @@ public class TrainingController {
         return trainingService.getTrainingsForLearner(learnerId);
     }
 
+    @Operation(summary = "Create an admin training",
+            description = "ADMIN only in the current HTTP API. learnerIds is required; use [] for an unassigned training. Selected IDs must belong to existing learners.")
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/admin/trainings")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TrainingDetailsResponse> createTraining(
-            @AuthenticationPrincipal AcademyUserPrincipal principal,
+            @Parameter(hidden = true) @AuthenticationPrincipal AcademyUserPrincipal principal,
             @Valid @RequestBody CreateTrainingRequest request
     ) {
         TrainingDetailsResponse response =
@@ -87,33 +102,39 @@ public class TrainingController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @Operation(summary = "Rename a training",
+            description = "ADMIN only in the current HTTP API. Changes the shared training name for all assignments.")
     @PutMapping("/admin/trainings/{trainingId}")
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateTraining(
-            @AuthenticationPrincipal AcademyUserPrincipal principal,
+            @Parameter(hidden = true) @AuthenticationPrincipal AcademyUserPrincipal principal,
             @PathVariable Long trainingId,
             @Valid @RequestBody UpdateTrainingRequest request
     ) {
         managementService.updateTraining(principal.getId(), trainingId, request);
     }
 
+    @Operation(summary = "Replace training assignments",
+            description = "ADMIN only. learnerIds is the complete desired set, not an incremental addition. Retained assignments keep progress; removed assignments and their comments are deleted.")
     @PutMapping("/admin/trainings/{trainingId}/assignments")
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateAssignments(
-            @AuthenticationPrincipal AcademyUserPrincipal principal,
+            @Parameter(hidden = true) @AuthenticationPrincipal AcademyUserPrincipal principal,
             @PathVariable Long trainingId,
             @Valid @RequestBody UpdateTrainingAssignmentsRequest request
     ) {
         managementService.updateAssignments(principal.getId(), trainingId, request);
     }
 
+    @Operation(summary = "Delete a training",
+            description = "ADMIN only. Removes the training and its assignments; assignment comments are deleted through the database cascade.")
     @DeleteMapping("/admin/trainings/{trainingId}")
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTraining(
-            @AuthenticationPrincipal AcademyUserPrincipal principal,
+            @Parameter(hidden = true) @AuthenticationPrincipal AcademyUserPrincipal principal,
             @PathVariable Long trainingId
     ) {
         managementService.deleteTraining(principal.getId(), trainingId);

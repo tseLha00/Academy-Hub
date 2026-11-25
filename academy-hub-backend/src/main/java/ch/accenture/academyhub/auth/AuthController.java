@@ -1,5 +1,10 @@
 package ch.accenture.academyhub.auth;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import ch.accenture.academyhub.security.AcademyUserPrincipal;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,6 +30,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Locale;
 
+@Tag(name = "Authentication", description = "Session login, current account, CSRF tokens, and logout.")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -40,11 +46,16 @@ public class AuthController {
         this.securityContextRepository = securityContextRepository;
     }
 
+    @Operation(summary = "Get a CSRF token",
+            description = "Public. Execute this first, keep browser cookies, and paste response token into Authorize > csrfToken.")
     @GetMapping("/csrf")
-    public CsrfTokenResponse csrf(CsrfToken csrfToken) {
+    public CsrfTokenResponse csrf(@Parameter(hidden = true) CsrfToken csrfToken) {
         return new CsrfTokenResponse(csrfToken.getHeaderName(), csrfToken.getToken());
     }
 
+    @Operation(summary = "Log in",
+            description = "Requires the csrfToken header and matching CSRF cookie. A successful login creates a browser-managed session.")
+    @ApiResponse(responseCode = "401", description = "Invalid username or password", content = @Content)
     @PostMapping("/login")
     public AuthenticatedUserResponse login(
             @Valid @RequestBody LoginRequest request,
@@ -77,13 +88,17 @@ public class AuthController {
         return toResponse((AcademyUserPrincipal) authentication.getPrincipal());
     }
 
+    @Operation(summary = "Get the signed-in account",
+            description = "Requires a session. Returns account identity and role; does not expose password hashes.")
     @GetMapping("/me")
     public AuthenticatedUserResponse currentUser(
-            @AuthenticationPrincipal AcademyUserPrincipal principal
+            @Parameter(hidden = true) @AuthenticationPrincipal AcademyUserPrincipal principal
     ) {
         return toResponse(principal);
     }
 
+    @Operation(summary = "Log out",
+            description = "Requires a session and csrfToken. Invalidates the session. Retrieve a fresh token before logging in again.")
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request) {
         SecurityContextHolder.clearContext();
