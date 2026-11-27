@@ -5,18 +5,22 @@
 - Removed the `/api/dev` training API and the `X-Dev-Actor-Id` identity header.
 - The authenticated `AcademyUserPrincipal` is now the source of the current user's ID and role.
 - Learners retrieve only their own assignments through `GET /api/trainings`.
+- Learners can create trainings assigned to themselves and edit only their own trainings.
+- Only a training's creator can edit or clear its description.
 - Admin-only operations are grouped under `/api/admin` and protected with method-level `@PreAuthorize("hasRole('ADMIN')")` checks.
 - Admins can retrieve a learner's assigned trainings through `GET /api/admin/learners/{learnerId}/trainings`.
-- Training create, edit, assignment changes, and deletion are no longer exposed to learners through the HTTP API.
+- Assignment changes and deletion remain admin-only.
 
 ## Endpoints
 
 | Method | Endpoint | Access |
 |---|---|---|
 | GET | `/api/trainings` | LEARNER — current user's trainings only |
+| POST | `/api/trainings` | LEARNER — automatically assigned to the caller |
+| PUT | `/api/trainings/{trainingId}` | LEARNER — own created training only |
 | GET | `/api/admin/learners/{learnerId}/trainings` | ADMIN |
 | POST | `/api/admin/trainings` | ADMIN |
-| PUT | `/api/admin/trainings/{trainingId}` | ADMIN |
+| PUT | `/api/admin/trainings/{trainingId}` | ADMIN — description changes are creator-only |
 | PUT | `/api/admin/trainings/{trainingId}/assignments` | ADMIN |
 | DELETE | `/api/admin/trainings/{trainingId}` | ADMIN |
 

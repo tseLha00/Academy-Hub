@@ -48,15 +48,26 @@ class TrainingManagementServiceTest {
 
         TrainingDetailsResponse response = managementService.createTraining(
                 learner.getId(),
-                new CreateTrainingRequest("  Java Practice  ", null, Set.of())
+                new CreateTrainingRequest(
+                        "  Java Practice  ",
+                        "Build practical Java skills",
+                        Set.of()
+                )
         );
 
         entityManager.flush();
         entityManager.clear();
 
         assertEquals("Java Practice", response.name());
+        assertEquals("Build practical Java skills", response.description());
         assertEquals(learner.getId(), response.createdById());
         assertEquals(List.of(learner.getId()), response.learnerIds());
+        assertEquals(
+                "Build practical Java skills",
+                trainingRepository.findById(response.trainingId())
+                        .orElseThrow()
+                        .getDescription()
+        );
 
         List<TrainingAssignment> assignments = assignmentRepository
                 .findAllWithTrainingByLearnerId(learner.getId());
@@ -67,6 +78,26 @@ class TrainingManagementServiceTest {
                 assignments.get(0).getTraining().getId()
         );
         assertFalse(assignments.get(0).isCompleted());
+    }
+
+    @Test
+    void learnerCanCreateTrainingWithoutDescription() {
+        User learner = persistUser("Learner Without Description", Role.LEARNER);
+
+        TrainingDetailsResponse response = managementService.createTraining(
+                learner.getId(),
+                new CreateTrainingRequest("Java Practice", null, Set.of())
+        );
+
+        entityManager.flush();
+        entityManager.clear();
+
+        assertNull(response.description());
+        assertEquals(learner.getId(), response.createdById());
+        assertEquals(List.of(learner.getId()), response.learnerIds());
+        assertNull(trainingRepository.findById(response.trainingId())
+                .orElseThrow()
+                .getDescription());
     }
 
     @Test
@@ -223,13 +254,20 @@ class TrainingManagementServiceTest {
 
         TrainingDetailsResponse created = managementService.createTraining(
                 learner.getId(),
-                new CreateTrainingRequest("Original Name", null, Set.of())
+                new CreateTrainingRequest(
+                        "Original Name",
+                        "Initial description",
+                        Set.of()
+                )
         );
 
         managementService.updateTraining(
                 learner.getId(),
                 created.trainingId(),
-                new UpdateTrainingRequest("  Updated Name  ", null)
+                new UpdateTrainingRequest(
+                        "  Updated Name  ",
+                        "Updated description"
+                )
         );
 
         entityManager.flush();
@@ -240,7 +278,21 @@ class TrainingManagementServiceTest {
                 .orElseThrow();
 
         assertEquals("Updated Name", updated.getName());
+        assertEquals("Updated description", updated.getDescription());
         assertEquals(learner.getId(), updated.getCreatedBy().getId());
+
+        managementService.updateTraining(
+                learner.getId(),
+                created.trainingId(),
+                new UpdateTrainingRequest("Updated Name", "")
+        );
+
+        entityManager.flush();
+        entityManager.clear();
+
+        assertNull(trainingRepository.findById(created.trainingId())
+                .orElseThrow()
+                .getDescription());
     }
 
     @Test
@@ -253,7 +305,7 @@ class TrainingManagementServiceTest {
                 admin.getId(),
                 new CreateTrainingRequest(
                         "Original Shared Name",
-                        null,
+                        "Initial shared description",
                         Set.of(learnerA.getId(), learnerB.getId())
                 )
         );
@@ -294,8 +346,45 @@ class TrainingManagementServiceTest {
 
         assertEquals("Updated Shared Name", updatedA.getTraining().getName());
         assertEquals("Updated Shared Name", updatedB.getTraining().getName());
+        assertEquals(
+                "Initial shared description",
+                updatedA.getTraining().getDescription()
+        );
         assertEquals(completedAt, updatedA.getCompletedAt());
         assertFalse(updatedB.isCompleted());
+    }
+
+    @Test
+    void adminCannotEditDescriptionOfTrainingCreatedByLearner() {
+        User owner = persistUser("Description Owner", Role.LEARNER);
+        User admin = persistUser("Description Admin", Role.ADMIN);
+
+        TrainingDetailsResponse created = managementService.createTraining(
+                owner.getId(),
+                new CreateTrainingRequest(
+                        "Original Name",
+                        "Owner description",
+                        Set.of()
+                )
+        );
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> managementService.updateTraining(
+                        admin.getId(),
+                        created.trainingId(),
+                        new UpdateTrainingRequest(
+                                "Changed Name",
+                                "Admin description"
+                        )
+                )
+        );
+
+        assertEquals(HttpStatus.FORBIDDEN, exception.getStatusCode());
+        Training training = trainingRepository.findById(created.trainingId())
+                .orElseThrow();
+        assertEquals("Original Name", training.getName());
+        assertEquals("Owner description", training.getDescription());
     }
 
     @Test

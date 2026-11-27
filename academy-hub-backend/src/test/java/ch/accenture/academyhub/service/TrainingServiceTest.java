@@ -152,6 +152,7 @@ class TrainingServiceTest {
 
         when(training.getId()).thenReturn(2L);
         when(training.getName()).thenReturn("Java Fundamentals");
+        when(training.getDescription()).thenReturn("Build practical Java skills");
 
         when(assignment.getId()).thenReturn(3L);
         when(assignment.getTraining()).thenReturn(training);
@@ -170,7 +171,7 @@ class TrainingServiceTest {
                         3L,
                         2L,
                         "Java Fundamentals",
-                        null,
+                        "Build practical Java skills",
                         true,
                         completedAt,
                         100

@@ -1,10 +1,13 @@
 
 package ch.accenture.academyhub.controller;
 
+import ch.accenture.academyhub.dto.CreateTrainingRequest;
 import ch.accenture.academyhub.dto.TrainingResponse;
+import ch.accenture.academyhub.dto.UpdateTrainingRequest;
 import ch.accenture.academyhub.entity.Role;
 import ch.accenture.academyhub.security.AcademyUserPrincipal;
 
+import ch.accenture.academyhub.service.TrainingManagementService;
 import ch.accenture.academyhub.service.TrainingService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,15 +19,18 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -36,11 +42,134 @@ class TrainingProgressSecurityTest {
     @MockitoBean
     private TrainingService trainingService;
 
+    @MockitoBean
+    private TrainingManagementService managementService;
+
     private static final String PROGRESS_URL =
             "/api/trainings/2/progress";
 
     private static final String ADMIN_LEARNER_TRAININGS_URL =
             "/api/admin/learners/4/trainings";
+
+    @Test
+    void adminCanCreateTrainingWithoutDescription() throws Exception {
+        AcademyUserPrincipal admin = new AcademyUserPrincipal(
+                6L, "admin", "hash", "Test", "Admin", Role.ADMIN
+        );
+        var authentication = new UsernamePasswordAuthenticationToken(
+                admin, null, admin.getAuthorities()
+        );
+        CreateTrainingRequest request = new CreateTrainingRequest(
+                "Java Practice", null, Set.of(4L)
+        );
+
+        when(managementService.createTraining(6L, request)).thenReturn(null);
+
+        mockMvc.perform(post("/api/admin/trainings")
+                        .with(authentication(authentication))
+                        .with(csrf())
+                        .contentType("application/json")
+                        .content("""
+                                {
+                                  "name": "Java Practice",
+                                  "learnerIds": [4]
+                                }
+                                """))
+                .andExpect(status().isCreated());
+
+        verify(managementService).createTraining(6L, request);
+    }
+
+    @Test
+    void learnerCanCreateTrainingWithoutDescription() throws Exception {
+        AcademyUserPrincipal learner = new AcademyUserPrincipal(
+                4L, "learner", "hash", "Test", "Learner", Role.LEARNER
+        );
+        var authentication = new UsernamePasswordAuthenticationToken(
+                learner, null, learner.getAuthorities()
+        );
+        CreateTrainingRequest request = new CreateTrainingRequest(
+                "Java Practice", null, Set.of()
+        );
+
+        when(managementService.createTraining(4L, request)).thenReturn(null);
+
+        mockMvc.perform(post("/api/trainings")
+                        .with(authentication(authentication))
+                        .with(csrf())
+                        .contentType("application/json")
+                        .content("""
+                                {
+                                  "name": "Java Practice",
+                                  "learnerIds": []
+                                }
+                                """))
+                .andExpect(status().isCreated());
+
+        verify(managementService).createTraining(4L, request);
+    }
+
+    @Test
+    void learnerCanUpdateOwnTraining() throws Exception {
+        AcademyUserPrincipal learner = new AcademyUserPrincipal(
+                4L, "learner", "hash", "Test", "Learner", Role.LEARNER
+        );
+        var authentication = new UsernamePasswordAuthenticationToken(
+                learner, null, learner.getAuthorities()
+        );
+        UpdateTrainingRequest request =
+                new UpdateTrainingRequest("Java Practice", "Updated description");
+
+        mockMvc.perform(put("/api/trainings/2")
+                        .with(authentication(authentication))
+                        .with(csrf())
+                        .contentType("application/json")
+                        .content("""
+                                {
+                                  "name": "Java Practice",
+                                  "description": "Updated description"
+                                }
+                                """))
+                .andExpect(status().isNoContent());
+
+        verify(managementService).updateTraining(4L, 2L, request);
+    }
+
+    @Test
+    void adminCannotUseLearnerTrainingEndpoints() throws Exception {
+        AcademyUserPrincipal admin = new AcademyUserPrincipal(
+                6L, "admin", "hash", "Test", "Admin", Role.ADMIN
+        );
+        var authentication = new UsernamePasswordAuthenticationToken(
+                admin, null, admin.getAuthorities()
+        );
+
+        mockMvc.perform(post("/api/trainings")
+                        .with(authentication(authentication))
+                        .with(csrf())
+                        .contentType("application/json")
+                        .content("""
+                                {
+                                  "name": "Java Practice",
+                                  "learnerIds": []
+                                }
+                                """))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(put("/api/trainings/2")
+                        .with(authentication(authentication))
+                        .with(csrf())
+                        .contentType("application/json")
+                        .content("""
+                                {
+                                  "name": "Java Practice",
+                                  "description": "Updated description"
+                                }
+                                """))
+                .andExpect(status().isForbidden());
+
+        verifyNoInteractions(managementService);
+    }
 
     @Test
     void learnerCanUpdateTrainingProgress() throws Exception {

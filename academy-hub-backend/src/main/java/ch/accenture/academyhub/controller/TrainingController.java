@@ -42,6 +42,28 @@ public class TrainingController {
         return trainingService.getTrainingsForLearner(principal.getId());
     }
 
+    @PostMapping("/trainings")
+    @PreAuthorize("hasRole('LEARNER')")
+    public ResponseEntity<TrainingDetailsResponse> createOwnTraining(
+            @AuthenticationPrincipal AcademyUserPrincipal principal,
+            @Valid @RequestBody CreateTrainingRequest request
+    ) {
+        TrainingDetailsResponse response =
+                managementService.createTraining(principal.getId(), request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PutMapping("/trainings/{trainingId}")
+    @PreAuthorize("hasRole('LEARNER')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateOwnTraining(
+            @AuthenticationPrincipal AcademyUserPrincipal principal,
+            @PathVariable Long trainingId,
+            @Valid @RequestBody UpdateTrainingRequest request
+    ) {
+        managementService.updateTraining(principal.getId(), trainingId, request);
+    }
+
     /** A learner can complete only a training assigned to their own account. */
     @PostMapping("/trainings/{trainingId}/complete")
     @PreAuthorize("hasRole('LEARNER')")
