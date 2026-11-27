@@ -1,6 +1,9 @@
 package ch.accenture.academyhub.dto;
 
+import ch.accenture.academyhub.entity.TrainingStatus;
+
 import java.time.Instant;
+import java.time.LocalDate;
 
 public record TrainingResponse(
         Long assignmentId,
@@ -8,6 +11,8 @@ public record TrainingResponse(
         String name,
         boolean completed,
         Instant completedAt,
-        int progressPercentage
+        TrainingStatus status,
+        LocalDate startDate,
+        LocalDate estimatedCompletionDate
 ) {
 }

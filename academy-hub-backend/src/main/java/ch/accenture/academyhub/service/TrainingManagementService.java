@@ -65,6 +65,13 @@ public class TrainingManagementService {
 
             learnerIds = Set.of(actor.getId());
         } else if (actor.getRole() == Role.ADMIN) {
+            if (request.startDate() != null || request.estimatedCompletionDate() != null) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Dates are set by the assigned learner"
+                );
+            }
+
             learnerIds = request.learnerIds();
         } else {
             throw new ResponseStatusException(
@@ -98,6 +105,16 @@ public class TrainingManagementService {
         List<TrainingAssignment> assignments = learners.stream()
                 .map(learner -> new TrainingAssignment(training, learner))
                 .toList();
+
+        if (actor.getRole() == Role.LEARNER) {
+            try {
+                assignments.forEach(assignment -> assignment.updateDates(
+                        request.startDate(), request.estimatedCompletionDate()
+                ));
+            } catch (IllegalArgumentException exception) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, exception.getMessage());
+            }
+        }
 
         assignmentRepository.saveAll(assignments);
 

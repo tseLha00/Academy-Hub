@@ -2,7 +2,9 @@
 package ch.accenture.academyhub.controller;
 
 import ch.accenture.academyhub.dto.TrainingResponse;
+import ch.accenture.academyhub.dto.UpdateTrainingProgressRequest;
 import ch.accenture.academyhub.entity.Role;
+import ch.accenture.academyhub.entity.TrainingStatus;
 import ch.accenture.academyhub.security.AcademyUserPrincipal;
 
 import ch.accenture.academyhub.service.TrainingService;
@@ -16,6 +18,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -24,6 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 @SpringBootTest
@@ -38,6 +42,10 @@ class TrainingProgressSecurityTest {
 
     private static final String PROGRESS_URL =
             "/api/trainings/2/progress";
+
+    private static final String PROGRESS_BODY = """
+            {"status":"IN_PROGRESS","startDate":"2026-11-01","estimatedCompletionDate":"2026-12-31"}
+            """;
 
     private static final String ADMIN_LEARNER_TRAININGS_URL =
             "/api/admin/learners/4/trainings";
@@ -56,10 +64,34 @@ class TrainingProgressSecurityTest {
                         .with(authentication(authentication))
                         .with(csrf())
                         .contentType("application/json")
-                        .content("{\"progressPercentage\":65}"))
+                        .content(PROGRESS_BODY))
                 .andExpect(status().isNoContent());
 
-        verify(trainingService).updateTrainingProgress(4L, 2L, 65);
+        verify(trainingService).updateTrainingProgress(4L, 2L, new UpdateTrainingProgressRequest(
+                TrainingStatus.IN_PROGRESS,
+                LocalDate.of(2026, 11, 1),
+                LocalDate.of(2026, 12, 31)
+        ));
+    }
+
+    @Test
+    void learnerMustProvideEstimatedCompletionDate() throws Exception {
+        AcademyUserPrincipal learner = new AcademyUserPrincipal(
+                4L, "learner", "hash", "Test", "Learner", Role.LEARNER
+        );
+
+        var authentication = new UsernamePasswordAuthenticationToken(
+                learner, null, learner.getAuthorities()
+        );
+
+        mockMvc.perform(put(PROGRESS_URL)
+                        .with(authentication(authentication))
+                        .with(csrf())
+                        .contentType("application/json")
+                        .content("{\"status\":\"IN_PROGRESS\"}"))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(trainingService);
     }
 
     @Test
@@ -76,7 +108,7 @@ class TrainingProgressSecurityTest {
                         .with(authentication(authentication))
                         .with(csrf())
                         .contentType("application/json")
-                        .content("{\"progressPercentage\":65}"))
+                        .content(PROGRESS_BODY))
                 .andExpect(status().isForbidden());
     }
 
@@ -85,7 +117,7 @@ class TrainingProgressSecurityTest {
         mockMvc.perform(put(PROGRESS_URL)
                         .with(csrf())
                         .contentType("application/json")
-                        .content("{\"progressPercentage\":65}"))
+                        .content(PROGRESS_BODY))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -108,7 +140,9 @@ class TrainingProgressSecurityTest {
                         "Java Fundamentals",
                         false,
                         null,
-                        65
+                        TrainingStatus.IN_PROGRESS,
+                        LocalDate.of(2026, 11, 1),
+                        LocalDate.of(2026, 12, 31)
                 ),
                 new TrainingResponse(
                         5L,
@@ -116,7 +150,9 @@ class TrainingProgressSecurityTest {
                         "Spring Boot",
                         true,
                         completedAt,
-                        100
+                        TrainingStatus.COMPLETED,
+                        null,
+                        LocalDate.of(2026, 10, 31)
                 )
         ));
 
@@ -124,10 +160,12 @@ class TrainingProgressSecurityTest {
                         .with(authentication(authentication)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("Java Fundamentals"))
-                .andExpect(jsonPath("$[0].progressPercentage").value(65))
+                .andExpect(jsonPath("$[0].status").value("IN_PROGRESS"))
+                .andExpect(jsonPath("$[0].startDate").value("2026-11-01"))
+                .andExpect(jsonPath("$[0].estimatedCompletionDate").value("2026-12-31"))
                 .andExpect(jsonPath("$[0].completed").value(false))
                 .andExpect(jsonPath("$[1].name").value("Spring Boot"))
-                .andExpect(jsonPath("$[1].progressPercentage").value(100))
+                .andExpect(jsonPath("$[1].status").value("COMPLETED"))
                 .andExpect(jsonPath("$[1].completed").value(true));
 
         verify(trainingService).getTrainingsForLearner(4L);

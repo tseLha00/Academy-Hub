@@ -1,13 +1,17 @@
 package ch.accenture.academyhub.dto;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
+import ch.accenture.academyhub.entity.TrainingStatus;
 import jakarta.validation.constraints.NotNull;
+
+import java.time.LocalDate;
 
 public record UpdateTrainingProgressRequest(
         @NotNull
-        @Min(0)
-        @Max(100)
-        Integer progressPercentage
+        TrainingStatus status,
+
+        LocalDate startDate,
+
+        @NotNull
+        LocalDate estimatedCompletionDate
 ) {
 }

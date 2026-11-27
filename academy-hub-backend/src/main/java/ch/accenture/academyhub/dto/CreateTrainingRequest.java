@@ -5,8 +5,10 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
+import java.time.LocalDate;
 import java.util.Set;
 
+/** The dates are set by learners only; admins assign without dates. */
 public record CreateTrainingRequest(
 
         @NotBlank
@@ -14,7 +16,14 @@ public record CreateTrainingRequest(
         String name,
 
         @NotNull
-        Set<@NotNull @Positive Long> learnerIds
+        Set<@NotNull @Positive Long> learnerIds,
+
+        LocalDate startDate,
+
+        LocalDate estimatedCompletionDate
 
 ) {
+    public CreateTrainingRequest(String name, Set<Long> learnerIds) {
+        this(name, learnerIds, null, null);
+    }
 }

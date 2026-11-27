@@ -7,6 +7,7 @@ import ch.accenture.academyhub.dto.UpdateTrainingProgressRequest;
 import ch.accenture.academyhub.dto.UpdateTrainingAssignmentsRequest;
 import ch.accenture.academyhub.dto.UpdateTrainingRequest;
 import ch.accenture.academyhub.entity.Role;
+import ch.accenture.academyhub.entity.TrainingStatus;
 import ch.accenture.academyhub.security.AcademyUserPrincipal;
 import ch.accenture.academyhub.service.TrainingManagementService;
 import ch.accenture.academyhub.service.TrainingService;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -49,7 +51,7 @@ class TrainingControllerTest {
     void learnerRetrievesTrainingsUsingAuthenticatedIdentity() {
         Instant completedAt = Instant.parse("2026-10-20T10:00:00Z");
         List<TrainingResponse> expected = List.of(new TrainingResponse(
-                3L, 2L, "Java Fundamentals", true, completedAt, 100
+                3L, 2L, "Java Fundamentals", true, completedAt, TrainingStatus.COMPLETED, null, null
         ));
         when(trainingService.getTrainingsForLearner(4L)).thenReturn(expected);
 
@@ -65,10 +67,11 @@ class TrainingControllerTest {
 
     @Test
     void learnerUpdatesProgressUsingAuthenticatedIdentity() {
-        controller.updateTrainingProgress(
-                learner(), 2L, new UpdateTrainingProgressRequest(65)
+        UpdateTrainingProgressRequest request = new UpdateTrainingProgressRequest(
+                TrainingStatus.IN_PROGRESS, null, LocalDate.of(2026, 12, 31)
         );
-        verify(trainingService).updateTrainingProgress(4L, 2L, 65);
+        controller.updateTrainingProgress(learner(), 2L, request);
+        verify(trainingService).updateTrainingProgress(4L, 2L, request);
     }
 
     @Test
