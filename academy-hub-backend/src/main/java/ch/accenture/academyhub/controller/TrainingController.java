@@ -109,13 +109,14 @@ public class TrainingController {
         managementService.updateAssignments(principal.getId(), trainingId, request);
     }
 
-    @DeleteMapping("/admin/trainings/{trainingId}")
+    @PutMapping("/admin/trainings/{trainingId}/approve")
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteTraining(
+    public void approveTraining(
             @AuthenticationPrincipal AcademyUserPrincipal principal,
             @PathVariable Long trainingId
     ) {
-        managementService.deleteTraining(principal.getId(), trainingId);
+        managementService.approveTraining(principal.getId(), trainingId);
     }
+
 }

@@ -22,6 +22,18 @@ public class Training {
     public Training(String name, User createdBy) {
         this.name = name;
         this.createdBy = createdBy;
+        this.approved = false;
+    }
+
+    @Column(name = "approved", nullable = false)
+    private boolean approved = false;
+
+    public boolean isApproved() {
+        return approved;
+    }
+
+    public void setApproved(boolean approved) {
+        this.approved = approved;
     }
 
     public Long getId() {

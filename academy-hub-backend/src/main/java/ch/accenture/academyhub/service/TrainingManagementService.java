@@ -108,7 +108,8 @@ public class TrainingManagementService {
                 learners.stream()
                         .map(User::getId)
                         .sorted()
-                        .toList()
+                        .toList(),
+                false
         );
     }
 
@@ -146,11 +147,23 @@ public class TrainingManagementService {
     }
 
     @Transactional
-    public void updateAssignments(
-            @NotNull @Positive Long actorId,
-            @NotNull @Positive Long trainingId,
-            @NotNull @Valid UpdateTrainingAssignmentsRequest request
-    ) {
+    public void approveTraining(@NotNull @Positive Long actorId, @NotNull @Positive Long trainingId) {
+        User actor = userRepository.findById(actorId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED,
+                        "Acting user does not exist"
+                ));
+        if (actor.getRole() != Role.ADMIN) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only admins can approve trainings");
+        }
+        Training training = trainingRepository.findById(trainingId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Training does not exist"
+                ));
+        training.setApproved(true);
+        trainingRepository.save(training);
+    }
         User actor = userRepository.findById(actorId)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.UNAUTHORIZED,

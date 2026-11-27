@@ -63,7 +63,8 @@ public class TrainingService {
                         assignment.getTraining().getName(),
                         assignment.isCompleted(),
                         assignment.getCompletedAt(),
-                        assignment.getProgressPercentage()
+                        assignment.getProgressPercentage(),
+                        assignment.getTraining().isApproved()
                 ))
                 .toList();
     }

@@ -6,6 +6,7 @@ public record TrainingDetailsResponse(
         Long trainingId,
         String name,
         Long createdById,
-        List<Long> learnerIds
+        List<Long> learnerIds,
+        boolean approved
 ) {
 }
