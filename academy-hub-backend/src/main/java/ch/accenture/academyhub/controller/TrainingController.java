@@ -53,7 +53,7 @@ public class TrainingController {
         trainingService.completeTraining(principal.getId(), trainingId);
     }
 
-    /** A learner can update progress only for their own assigned training. */
+    /** A learner can update status and dates only for their own assigned training. */
     @PutMapping("/trainings/{trainingId}/progress")
     @PreAuthorize("hasRole('LEARNER')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -62,9 +62,7 @@ public class TrainingController {
             @PathVariable Long trainingId,
             @Valid @RequestBody UpdateTrainingProgressRequest request
     ) {
-        trainingService.updateTrainingProgress(
-                principal.getId(), trainingId, request.progressPercentage()
-        );
+        trainingService.updateTrainingProgress(principal.getId(), trainingId, request);
     }
 
     /** Admin-only learner lookup, used by administrative workflows. */

@@ -7,6 +7,7 @@ import ch.accenture.academyhub.dto.UpdateTrainingRequest;
 import ch.accenture.academyhub.entity.Training;
 import ch.accenture.academyhub.entity.Role;
 import ch.accenture.academyhub.entity.TrainingAssignment;
+import ch.accenture.academyhub.entity.TrainingStatus;
 import ch.accenture.academyhub.entity.User;
 import ch.accenture.academyhub.repository.TrainingAssignmentRepository;
 import ch.accenture.academyhub.repository.TrainingRepository;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
+import java.time.LocalDate;
 
 import java.util.List;
 import java.util.Set;
@@ -29,6 +31,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @Transactional
 class TrainingManagementServiceTest {
+
+    private static final LocalDate ESTIMATED_COMPLETION = LocalDate.of(2026, 12, 31);
 
     @Autowired
     private TrainingManagementService managementService;
@@ -48,7 +52,7 @@ class TrainingManagementServiceTest {
 
         TrainingDetailsResponse response = managementService.createTraining(
                 learner.getId(),
-                new CreateTrainingRequest("  Java Practice  ", Set.of())
+                new CreateTrainingRequest("  Java Practice  ", Set.of(), null, ESTIMATED_COMPLETION)
         );
 
         entityManager.flush();
@@ -219,7 +223,7 @@ class TrainingManagementServiceTest {
 
         TrainingDetailsResponse created = managementService.createTraining(
                 learner.getId(),
-                new CreateTrainingRequest("Original Name", Set.of())
+                new CreateTrainingRequest("Original Name", Set.of(), null, ESTIMATED_COMPLETION)
         );
 
         managementService.updateTraining(
@@ -262,7 +266,7 @@ class TrainingManagementServiceTest {
         entityManager.flush();
         entityManager.createNativeQuery("""
             UPDATE training_assignments
-            SET completed_at = :completedAt
+            SET completed_at = :completedAt, status = 'COMPLETED'
             WHERE id = :assignmentId
             """)
                 .setParameter("completedAt", completedAt)
@@ -300,7 +304,7 @@ class TrainingManagementServiceTest {
 
         TrainingDetailsResponse created = managementService.createTraining(
                 owner.getId(),
-                new CreateTrainingRequest("Original Name", Set.of())
+                new CreateTrainingRequest("Original Name", Set.of(), null, ESTIMATED_COMPLETION)
         );
 
         ResponseStatusException exception = assertThrows(
@@ -327,7 +331,7 @@ class TrainingManagementServiceTest {
 
         TrainingDetailsResponse created = managementService.createTraining(
                 learner.getId(),
-                new CreateTrainingRequest("Original Name", Set.of())
+                new CreateTrainingRequest("Original Name", Set.of(), null, ESTIMATED_COMPLETION)
         );
 
         assertThrows(
@@ -364,7 +368,7 @@ class TrainingManagementServiceTest {
         entityManager.flush();
         entityManager.createNativeQuery("""
             UPDATE training_assignments
-            SET completed_at = :completedAt
+            SET completed_at = :completedAt, status = 'COMPLETED'
             WHERE training_id = :trainingId
             """)
                 .setParameter("completedAt", completedAt)
@@ -423,7 +427,7 @@ class TrainingManagementServiceTest {
         entityManager.flush();
         entityManager.createNativeQuery("""
             UPDATE training_assignments
-            SET completed_at = CURRENT_TIMESTAMP
+            SET completed_at = CURRENT_TIMESTAMP, status = 'COMPLETED'
             WHERE training_id = :trainingId
             """)
                 .setParameter("trainingId", created.trainingId())
@@ -465,7 +469,7 @@ class TrainingManagementServiceTest {
 
         TrainingDetailsResponse created = managementService.createTraining(
                 learner.getId(),
-                new CreateTrainingRequest("Personal Training", Set.of())
+                new CreateTrainingRequest("Personal Training", Set.of(), null, ESTIMATED_COMPLETION)
         );
 
         ResponseStatusException exception = assertThrows(
@@ -537,7 +541,7 @@ class TrainingManagementServiceTest {
         entityManager.flush();
         entityManager.createNativeQuery("""
             UPDATE training_assignments
-            SET completed_at = CURRENT_TIMESTAMP
+            SET completed_at = CURRENT_TIMESTAMP, status = 'COMPLETED'
             WHERE id = :assignmentId
             """)
                 .setParameter("assignmentId", assignmentId)
@@ -560,7 +564,7 @@ class TrainingManagementServiceTest {
 
         TrainingDetailsResponse created = managementService.createTraining(
                 learner.getId(),
-                new CreateTrainingRequest("Assigned Personal Training", Set.of())
+                new CreateTrainingRequest("Assigned Personal Training", Set.of(), null, ESTIMATED_COMPLETION)
         );
 
         ResponseStatusException exception = assertThrows(
@@ -588,7 +592,7 @@ class TrainingManagementServiceTest {
 
         TrainingDetailsResponse created = managementService.createTraining(
                 learner.getId(),
-                new CreateTrainingRequest("Unassigned Personal Training", Set.of())
+                new CreateTrainingRequest("Unassigned Personal Training", Set.of(), null, ESTIMATED_COMPLETION)
         );
 
         managementService.updateAssignments(
@@ -631,6 +635,101 @@ class TrainingManagementServiceTest {
 
         assertEquals(HttpStatus.FORBIDDEN, exception.getStatusCode());
         assertTrue(trainingRepository.existsById(created.trainingId()));
+    }
+
+    @Test
+    void learnerCreatedTrainingStoresSelectedDates() {
+        User learner = persistUser("Dated Learner", Role.LEARNER);
+        LocalDate startDate = LocalDate.of(2025, 1, 15);
+
+        managementService.createTraining(
+                learner.getId(),
+                new CreateTrainingRequest("Dated Training", Set.of(), startDate, ESTIMATED_COMPLETION)
+        );
+        entityManager.flush();
+        entityManager.clear();
+
+        TrainingAssignment assignment = assignmentRepository
+                .findAllWithTrainingByLearnerId(learner.getId())
+                .get(0);
+        assertEquals(startDate, assignment.getStartDate());
+        assertEquals(ESTIMATED_COMPLETION, assignment.getEstimatedCompletionDate());
+    }
+
+    @Test
+    void learnerCannotCreateTrainingWithoutEstimatedCompletionDate() {
+        User learner = persistUser("Undated Learner", Role.LEARNER);
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> managementService.createTraining(
+                        learner.getId(),
+                        new CreateTrainingRequest("Undated Training", Set.of())
+                )
+        );
+
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+    }
+
+    @Test
+    void learnerCannotCreateTrainingEndingBeforeItStarts() {
+        User learner = persistUser("Reversed Learner", Role.LEARNER);
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> managementService.createTraining(
+                        learner.getId(),
+                        new CreateTrainingRequest(
+                                "Reversed Training",
+                                Set.of(),
+                                ESTIMATED_COMPLETION.plusDays(1),
+                                ESTIMATED_COMPLETION
+                        )
+                )
+        );
+
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+    }
+
+    @Test
+    void adminCreatesAssignmentsWithoutDates() {
+        User admin = persistUser("Dateless Admin", Role.ADMIN);
+        User learner = persistUser("Dateless Learner", Role.LEARNER);
+
+        managementService.createTraining(
+                admin.getId(),
+                new CreateTrainingRequest("Admin Training", Set.of(learner.getId()))
+        );
+        entityManager.flush();
+        entityManager.clear();
+
+        TrainingAssignment assignment = assignmentRepository
+                .findAllWithTrainingByLearnerId(learner.getId())
+                .get(0);
+        assertNull(assignment.getStartDate());
+        assertNull(assignment.getEstimatedCompletionDate());
+        assertEquals(TrainingStatus.TODO, assignment.getStatus());
+    }
+
+    @Test
+    void adminCannotSetLearnerDates() {
+        User admin = persistUser("Dating Admin", Role.ADMIN);
+        User learner = persistUser("Dated Assignee", Role.LEARNER);
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> managementService.createTraining(
+                        admin.getId(),
+                        new CreateTrainingRequest(
+                                "Admin Dated Training",
+                                Set.of(learner.getId()),
+                                null,
+                                ESTIMATED_COMPLETION
+                        )
+                )
+        );
+
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
     }
 
     private User persistUser(String name, Role role) {

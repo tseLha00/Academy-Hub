@@ -3,6 +3,7 @@ package ch.accenture.academyhub.repository;
 import ch.accenture.academyhub.entity.Role;
 import ch.accenture.academyhub.entity.Training;
 import ch.accenture.academyhub.entity.TrainingAssignment;
+import ch.accenture.academyhub.entity.TrainingStatus;
 import ch.accenture.academyhub.entity.User;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -97,77 +100,61 @@ class TrainingAssignmentRepositoryTest {
                 .orElseThrow();
         assertTrue(reloaded.isCompleted());
         assertNotNull(reloaded.getCompletedAt());
-        assertEquals(100, reloaded.getProgressPercentage());
+        assertEquals(TrainingStatus.COMPLETED, reloaded.getStatus());
 
         TrainingAssignment otherLearnerAssignment = assignmentRepository
                 .findByTrainingIdAndLearnerId(training.getId(), learnerB.getId())
                 .orElseThrow();
         assertFalse(otherLearnerAssignment.isCompleted());
-        assertEquals(0, otherLearnerAssignment.getProgressPercentage());
+        assertEquals(TrainingStatus.TODO, otherLearnerAssignment.getStatus());
     }
 
     @Test
-    void persistsPartialProgressForLearnerAssignment() {
-        User learner = new User("Progress Test", "Learner", Role.LEARNER);
-        entityManager.persist(learner);
-        Training training = new Training("Progress Test Training", learner);
-        entityManager.persist(training);
-        TrainingAssignment assignment = new TrainingAssignment(training, learner);
-        entityManager.persist(assignment);
+    void persistsStatusAndDatesForLearnerAssignment() {
+        TrainingAssignment assignment = persistAssignment("Status Test");
+        LocalDate startDate = LocalDate.of(2025, 3, 1);
+        LocalDate estimatedCompletionDate = LocalDate.of(2025, 4, 30);
 
-        assignment.updateProgressPercentage(45);
+        assignment.updateDates(startDate, estimatedCompletionDate);
+        assignment.updateStatus(TrainingStatus.BLOCKED);
         entityManager.flush();
         entityManager.clear();
 
-        TrainingAssignment reloaded = assignmentRepository
-                .findByTrainingIdAndLearnerId(training.getId(), learner.getId())
+        TrainingAssignment reloaded = assignmentRepository.findById(assignment.getId())
                 .orElseThrow();
-        assertEquals(45, reloaded.getProgressPercentage());
-        assertFalse(reloaded.isCompleted());
+        assertEquals(TrainingStatus.BLOCKED, reloaded.getStatus());
+        assertEquals(startDate, reloaded.getStartDate());
+        assertEquals(estimatedCompletionDate, reloaded.getEstimatedCompletionDate());
         assertNull(reloaded.getCompletedAt());
     }
 
     @Test
-    void rejectsProgressOutsideZeroToOneHundred() {
-        User learner = new User("Invalid Progress", "Learner", Role.LEARNER);
-        entityManager.persist(learner);
-        Training training = new Training("Invalid Progress Training", learner);
-        entityManager.persist(training);
-        TrainingAssignment assignment = new TrainingAssignment(training, learner);
+    void rejectsEstimatedCompletionDateBeforeStartDate() {
+        TrainingAssignment assignment = persistAssignment("Reversed Dates");
+        LocalDate startDate = LocalDate.of(2025, 3, 1);
+
         assertThrows(IllegalArgumentException.class,
-                () -> assignment.updateProgressPercentage(101));
+                () -> assignment.updateDates(startDate, startDate.minusDays(1)));
         assertThrows(IllegalArgumentException.class,
-                () -> assignment.updateProgressPercentage(-1));
+                () -> assignment.updateDates(startDate, null));
+        assertNull(assignment.getEstimatedCompletionDate());
     }
 
     @Test
-    void settingProgressToOneHundredMarksAssignmentCompleted() {
-        User learner = new User("Complete Progress", "Learner", Role.LEARNER);
-        entityManager.persist(learner);
-        Training training = new Training("Complete Progress Training", learner);
-        entityManager.persist(training);
-        TrainingAssignment assignment = new TrainingAssignment(training, learner);
+    void reopeningClearsCompletionAndCompletingAgainRecordsNewTimestamp() {
+        TrainingAssignment assignment = persistAssignment("Reopen Test");
 
-        assignment.updateProgressPercentage(100);
+        assignment.updateStatus(TrainingStatus.COMPLETED);
+        Instant firstCompletion = assignment.getCompletedAt();
+        assertNotNull(firstCompletion);
 
-        assertEquals(100, assignment.getProgressPercentage());
-        assertTrue(assignment.isCompleted());
+        assignment.updateStatus(TrainingStatus.IN_PROGRESS);
+        assertNull(assignment.getCompletedAt());
+        assertFalse(assignment.isCompleted());
+
+        assignment.updateStatus(TrainingStatus.COMPLETED);
         assertNotNull(assignment.getCompletedAt());
-    }
-
-    @Test
-    void completedAssignmentCannotBeMovedBackwards() {
-        User learner = new User("Backward Progress", "Learner", Role.LEARNER);
-        entityManager.persist(learner);
-        Training training = new Training("Backward Progress Training", learner);
-        entityManager.persist(training);
-        TrainingAssignment assignment = new TrainingAssignment(training, learner);
-        assignment.markCompleted();
-
-        assertThrows(IllegalStateException.class,
-                () -> assignment.updateProgressPercentage(80));
-        assertEquals(100, assignment.getProgressPercentage());
-        assertTrue(assignment.isCompleted());
+        assertFalse(assignment.getCompletedAt().isBefore(firstCompletion));
     }
 
     @Test
@@ -181,5 +168,15 @@ class TrainingAssignmentRepositoryTest {
                 .findAllWithTrainingByLearnerId(learner.getId());
 
         assertTrue(result.isEmpty());
+    }
+
+    private TrainingAssignment persistAssignment(String name) {
+        User learner = new User(name, "Learner", Role.LEARNER);
+        entityManager.persist(learner);
+        Training training = new Training(name + " Training", learner);
+        entityManager.persist(training);
+        TrainingAssignment assignment = new TrainingAssignment(training, learner);
+        entityManager.persist(assignment);
+        return assignment;
     }
 }

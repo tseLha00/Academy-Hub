@@ -1,6 +1,7 @@
 package ch.accenture.academyhub.service;
 
 import ch.accenture.academyhub.dto.TrainingResponse;
+import ch.accenture.academyhub.dto.UpdateTrainingProgressRequest;
 import ch.accenture.academyhub.repository.TrainingAssignmentRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -34,9 +35,13 @@ public class TrainingService {
         assignmentRepository.save(assignment);
     }
 
-    /** Updates progress only for the authenticated learner's own assignment. */
+    /** Updates status and dates only for the authenticated learner's own assignment. */
     @Transactional
-    public void updateTrainingProgress(Long learnerId, Long trainingId, int progressPercentage) {
+    public void updateTrainingProgress(
+            Long learnerId,
+            Long trainingId,
+            UpdateTrainingProgressRequest request
+    ) {
         var assignment = assignmentRepository
                 .findByTrainingIdAndLearnerId(trainingId, learnerId)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -45,10 +50,11 @@ public class TrainingService {
                 ));
 
         try {
-            assignment.updateProgressPercentage(progressPercentage);
-        } catch (IllegalStateException exception) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, exception.getMessage());
+            assignment.updateDates(request.startDate(), request.estimatedCompletionDate());
+        } catch (IllegalArgumentException exception) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, exception.getMessage());
         }
+        assignment.updateStatus(request.status());
         assignmentRepository.save(assignment);
     }
 
@@ -63,7 +69,9 @@ public class TrainingService {
                         assignment.getTraining().getName(),
                         assignment.isCompleted(),
                         assignment.getCompletedAt(),
-                        assignment.getProgressPercentage()
+                        assignment.getStatus(),
+                        assignment.getStartDate(),
+                        assignment.getEstimatedCompletionDate()
                 ))
                 .toList();
     }

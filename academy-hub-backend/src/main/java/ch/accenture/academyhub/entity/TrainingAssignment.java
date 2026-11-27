@@ -2,6 +2,8 @@ package ch.accenture.academyhub.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,6 +14,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
 import java.time.Instant;
+import java.time.LocalDate;
 
 @Entity
 @Table(
@@ -38,8 +41,15 @@ public class TrainingAssignment {
     @Column(name = "completed_at")
     private Instant completedAt;
 
-    @Column(name = "progress_percentage", nullable = false)
-    private int progressPercentage;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 20)
+    private TrainingStatus status = TrainingStatus.TODO;
+
+    @Column(name = "start_date")
+    private LocalDate startDate;
+
+    @Column(name = "estimated_completion_date")
+    private LocalDate estimatedCompletionDate;
 
     protected TrainingAssignment() {
         // Required by JPA.
@@ -70,30 +80,49 @@ public class TrainingAssignment {
         return completedAt != null;
     }
 
-    public int getProgressPercentage() {
-        return progressPercentage;
+    public TrainingStatus getStatus() {
+        return status;
     }
 
-    /** Updates progress; a completed assignment cannot be moved backwards. */
-    public void updateProgressPercentage(int progressPercentage) {
-        if (progressPercentage < 0 || progressPercentage > 100) {
-            throw new IllegalArgumentException("Progress must be between 0 and 100");
-        }
-        if (isCompleted() && progressPercentage < 100) {
-            throw new IllegalStateException("Completed training progress cannot be reduced");
-        }
-
-        this.progressPercentage = progressPercentage;
-        if (progressPercentage == 100) {
-            markCompleted();
-        }
+    public LocalDate getStartDate() {
+        return startDate;
     }
 
-    /** Marks this learner's assignment as completed without overwriting its original timestamp. */
+    public LocalDate getEstimatedCompletionDate() {
+        return estimatedCompletionDate;
+    }
+
+    /** Sets the learner's planned dates; the start date is optional, the estimate is required. */
+    public void updateDates(LocalDate startDate, LocalDate estimatedCompletionDate) {
+        if (estimatedCompletionDate == null) {
+            throw new IllegalArgumentException("Estimated completion date is required");
+        }
+        if (startDate != null && estimatedCompletionDate.isBefore(startDate)) {
+            throw new IllegalArgumentException(
+                    "Estimated completion date cannot be before the start date"
+            );
+        }
+
+        this.startDate = startDate;
+        this.estimatedCompletionDate = estimatedCompletionDate;
+    }
+
+    /**
+     * Completing keeps an existing completion timestamp; any other status reopens the
+     * assignment and clears it, so completing again records a new timestamp.
+     */
+    public void updateStatus(TrainingStatus status) {
+        if (status == TrainingStatus.COMPLETED) {
+            if (completedAt == null) {
+                completedAt = Instant.now();
+            }
+        } else {
+            completedAt = null;
+        }
+        this.status = status;
+    }
+
     public void markCompleted() {
-        if (completedAt == null) {
-            completedAt = Instant.now();
-        }
-        progressPercentage = 100;
+        updateStatus(TrainingStatus.COMPLETED);
     }
 }
